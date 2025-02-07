@@ -10,16 +10,13 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @Table(name = "t_room")
-public class Room {
+public class Room extends BaseEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(name ="room_name" , nullable = false, unique = true)
-    private String roomName;
-
+    @Column(name = "name", nullable = false)
+    private String name;
 
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
     private List<Equipment> equipements;
+
 }

@@ -8,22 +8,23 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @Table(name = "t_equipment")
-public class Equipment {
+public class Equipment extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "equipement_ref")
-    private String equipmentRef;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "reference", nullable = false)
+    private EquipementRef reference;
 
-    @Column(name = "equipement_mark", nullable = true)
-    private String equipmentMark;
+    @Column(name = "mark", nullable = true)
+    private String mark;
 
-    @Column(name = "equipement_description",nullable = true)
+    @Column(name = "description",nullable = true)
     private String description;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "room_id", nullable = false)
+    @JoinColumn(name = "room", nullable = false)
     private Room room;
 }
