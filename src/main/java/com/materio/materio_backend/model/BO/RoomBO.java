@@ -1,10 +1,9 @@
 package com.materio.materio_backend.model.BO;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
+
 
 @Data
 @AllArgsConstructor

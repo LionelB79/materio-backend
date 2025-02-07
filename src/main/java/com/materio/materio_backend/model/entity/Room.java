@@ -1,10 +1,10 @@
 package com.materio.materio_backend.model.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
+
 
 @Entity
 @Data
@@ -13,8 +13,13 @@ import java.util.List;
 public class Room extends BaseEntity {
 
     @Id
-    @Column(name = "name", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+
+    @Column(name = "name", nullable = false, unique = true)
     private String name;
+
 
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
     private List<Equipment> equipements;
