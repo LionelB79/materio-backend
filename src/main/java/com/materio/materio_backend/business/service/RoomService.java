@@ -9,7 +9,5 @@ public interface RoomService {
 
     Room createRoom(RoomBO roomBO);
 
-    List<Room> getAllRooms();
-    Room getRoomByName(String name);
-    void deleteRoom(String name);
+
 }

@@ -12,4 +12,5 @@ public class EquipmentBO {
     private String mark;
     private String description;
     private String roomName;
+    private int quantity;
 }

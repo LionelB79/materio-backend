@@ -29,18 +29,4 @@ public class RoomServiceImpl implements RoomService {
         return roomRepo.save(room);
     }
 
-    @Override
-    public List<Room> getAllRooms() {
-        return List.of();
-    }
-
-    @Override
-    public Room getRoomByName(String name) {
-        return null;
-    }
-
-    @Override
-    public void deleteRoom(String name) {
-
-    }
 }

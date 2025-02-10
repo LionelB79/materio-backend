@@ -16,7 +16,7 @@ public class Equipment extends BaseEntity {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "reference", referencedColumnName = "name", nullable = false)
-    private EquipementRef reference;
+    private EquipmentRef reference;
 
     @Column(name = "mark", nullable = true)
     private String mark;
