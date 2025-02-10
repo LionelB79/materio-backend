@@ -1,6 +1,6 @@
-package com.materio.materio_backend.repository;
+package com.materio.materio_backend.jpa.repository;
 
-import com.materio.materio_backend.model.entity.Room;
+import com.materio.materio_backend.jpa.entity.Room;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

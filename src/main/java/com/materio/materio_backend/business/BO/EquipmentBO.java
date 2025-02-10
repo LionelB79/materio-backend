@@ -1,4 +1,4 @@
-package com.materio.materio_backend.model.BO;
+package com.materio.materio_backend.business.BO;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -1,9 +1,9 @@
-package com.materio.materio_backend.service.impl;
+package com.materio.materio_backend.business.service.impl;
 
-import com.materio.materio_backend.model.BO.RoomBO;
-import com.materio.materio_backend.model.entity.Room;
-import com.materio.materio_backend.repository.RoomRepository;
-import com.materio.materio_backend.service.RoomService;
+import com.materio.materio_backend.business.BO.RoomBO;
+import com.materio.materio_backend.jpa.entity.Room;
+import com.materio.materio_backend.business.service.RoomService;
+import com.materio.materio_backend.jpa.repository.RoomRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

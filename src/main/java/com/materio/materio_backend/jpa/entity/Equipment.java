@@ -1,4 +1,4 @@
-package com.materio.materio_backend.model.entity;
+package com.materio.materio_backend.jpa.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
@@ -15,7 +15,7 @@ public class Equipment extends BaseEntity {
     private Long id;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "reference", nullable = false)
+    @JoinColumn(name = "reference", referencedColumnName = "name", nullable = false)
     private EquipementRef reference;
 
     @Column(name = "mark", nullable = true)
@@ -25,6 +25,6 @@ public class Equipment extends BaseEntity {
     private String description;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "room", nullable = false)
+    @JoinColumn(name = "room", referencedColumnName = "name", nullable = false)
     private Room room;
 }

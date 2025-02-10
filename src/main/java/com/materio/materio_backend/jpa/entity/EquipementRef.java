@@ -1,4 +1,4 @@
-package com.materio.materio_backend.model.entity;
+package com.materio.materio_backend.jpa.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
@@ -15,13 +15,10 @@ import java.util.List;
 public class EquipementRef extends BaseEntity {
 
     @Id
-    @Column(name = "name", nullable = false)
+    @Column(name = "name", nullable = false, unique = true)
     private String name;
 
     @Column(name = "quantity", nullable = false)
     private Integer quantity;
 
-    @OneToMany(mappedBy = "reference", cascade = CascadeType.ALL)
-    @ToString.Exclude
-    private List<Equipment> equipments = new ArrayList<>();
 }

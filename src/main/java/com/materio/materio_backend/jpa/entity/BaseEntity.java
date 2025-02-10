@@ -1,4 +1,4 @@
-package com.materio.materio_backend.model.entity;
+package com.materio.materio_backend.jpa.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;

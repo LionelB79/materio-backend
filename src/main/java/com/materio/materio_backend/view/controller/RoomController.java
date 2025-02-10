@@ -1,8 +1,8 @@
-package com.materio.materio_backend.controller;
+package com.materio.materio_backend.view.controller;
 
-import com.materio.materio_backend.model.BO.RoomBO;
-import com.materio.materio_backend.model.entity.Room;
-import com.materio.materio_backend.service.RoomService;
+import com.materio.materio_backend.business.BO.RoomBO;
+import com.materio.materio_backend.jpa.entity.Room;
+import com.materio.materio_backend.business.service.RoomService;
 import org.slf4j.Logger;
 
 

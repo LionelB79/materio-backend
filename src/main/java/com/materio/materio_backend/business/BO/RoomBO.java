@@ -1,11 +1,12 @@
-package com.materio.materio_backend.model.BO;
+package com.materio.materio_backend.business.BO;
 
 import lombok.*;
 
 import java.util.List;
 
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class RoomBO {

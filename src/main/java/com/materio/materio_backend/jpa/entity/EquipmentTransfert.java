@@ -1,4 +1,4 @@
-package com.materio.materio_backend.model.entity;
+package com.materio.materio_backend.jpa.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
@@ -14,15 +14,19 @@ public class EquipmentTransfert {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "equipment_id", nullable = false)
-    private Equipment equipment;
+    @JoinColumn(name = "equipment_id",referencedColumnName = "id", nullable = false)
+    private Equipment equipmentId;
 
     @ManyToOne
-    @JoinColumn(name = "from_room", nullable = false)
+    @JoinColumn(name = "equipment_name", referencedColumnName = "reference", nullable = false)
+    private Equipment equipmentName;
+
+    @ManyToOne
+    @JoinColumn(name = "from_room", referencedColumnName = "name", nullable = false)
     private Room fromRoom;
 
     @ManyToOne
-    @JoinColumn(name = "to_room", nullable = false)
+    @JoinColumn(name = "to_room", referencedColumnName = "name", nullable = false)
     private Room toRoom;
 
     @Column(name = "transfer_date", nullable = false)
