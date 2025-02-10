@@ -11,10 +11,11 @@ import com.materio.materio_backend.jpa.repository.EquipmentRefRepository;
 import com.materio.materio_backend.jpa.repository.EquipmentRepository;
 import com.materio.materio_backend.jpa.repository.RoomRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-
+@Service
 public class EquipmentServiceImpl implements EquipmentService {
 
     @Autowired
@@ -25,13 +26,12 @@ public class EquipmentServiceImpl implements EquipmentService {
     private EquipmentRepository equipmentRepo;
 
     public void createEquipment(EquipmentBO equipmentBO) {
-
+        System.out.println("Recherche de la salle : " + Constants.ROOM_STOCKAGE);
 
         Room stockage = roomRepo.findByName(Constants.ROOM_STOCKAGE)
                 .orElseThrow(() -> new RuntimeException("La salle de stockage n'existe pas !"));
 
-
-        EquipmentRef equipmentRef = equipmentRefRepo.findById(equipmentBO.getReferenceName())
+        EquipmentRef equipmentRef = equipmentRefRepo.findByName(equipmentBO.getReferenceName())
                 .orElseGet(() -> {
                     EquipmentRef newRef = new EquipmentRef();
                     newRef.setName(equipmentBO.getReferenceName());
@@ -39,20 +39,17 @@ public class EquipmentServiceImpl implements EquipmentService {
                     return equipmentRefRepo.save(newRef);
                 });
 
-
         equipmentRef.setQuantity(equipmentRef.getQuantity() + equipmentBO.getQuantity());
         equipmentRefRepo.save(equipmentRef);
-
 
         for (int i = 0; i < equipmentBO.getQuantity(); i++) {
             Equipment equipment = new Equipment();
             equipment.setDescription(equipmentBO.getDescription());
             equipment.setMark(equipmentBO.getMark());
-            equipment.setReference(equipmentRef);
+            equipment.setReferenceName(equipmentBO.getReferenceName());
             equipment.setRoom(stockage);
             equipmentRepo.save(equipment);
         }
-
     }
 
 }

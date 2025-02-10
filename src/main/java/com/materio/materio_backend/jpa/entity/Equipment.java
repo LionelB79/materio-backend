@@ -14,17 +14,18 @@ public class Equipment extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "reference", referencedColumnName = "name", nullable = false)
-    private EquipmentRef reference;
+    @JoinColumn(name = "reference_name", referencedColumnName="name",nullable = false)
+    private String referenceName;
 
     @Column(name = "mark", nullable = true)
     private String mark;
 
-    @Column(name = "description",nullable = true)
+    @Column(name = "description", nullable = true)
     private String description;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "room", referencedColumnName = "name", nullable = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "room_id", referencedColumnName = "id", nullable = false)
     private Room room;
+
+
 }
