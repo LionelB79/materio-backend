@@ -44,15 +44,11 @@ public class EquipmentTransferServiceImpl implements EquipmentTransferService {
         LocalDateTime now = LocalDateTime.now();
         String transferDetails = request.getDetails();
 
-        for (EquipementVO equipementVO : request.getEquipments()) {
-            equipments.add(transferSingleEquipment(equipementVO, targetRoom, now, transferDetails));
-        }
-        /*
+
          return request.getEquipments().stream()
                 .map((equipment)->transferSingleEquipment(equipment, targetRoom, now, transferDetails))
                 .toList();
-*/
-        return equipments;
+
     }
 
     private EquipmentTransfer transferSingleEquipment(EquipementVO equipmentVO, Room targetRoom, LocalDateTime now, String transferDetails) {

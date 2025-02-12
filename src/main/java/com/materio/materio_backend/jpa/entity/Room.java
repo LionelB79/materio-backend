@@ -26,5 +26,6 @@ public class Room extends BaseEntity {
     @Column(name = "name", nullable = false, unique = true)
     private String name;
 
-
+    @OneToMany(mappedBy = "room", fetch = FetchType.LAZY)
+    private Set<Equipment> equipments = new HashSet<>();
 }
