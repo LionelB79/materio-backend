@@ -1,6 +1,7 @@
 package com.materio.materio_backend.jpa.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
@@ -20,7 +21,7 @@ public class EquipmentRef extends BaseEntity {
     @Column(name = "name", unique = true)
     private String name;
 
-    @NotBlank(message = "La quantité d'objets à créer est obligatoire")
+    @Min(value = 0, message = "La quantité ne peut pas être négative")
     @Column(name = "quantity", nullable = false)
     private Integer quantity;
 

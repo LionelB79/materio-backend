@@ -4,6 +4,7 @@ import com.materio.materio_backend.Constants;
 import com.materio.materio_backend.business.BO.EquipmentBO;
 import com.materio.materio_backend.business.BO.RoomBO;
 import com.materio.materio_backend.business.exception.RoomNotFoundException;
+import com.materio.materio_backend.business.service.EquipmentRefService;
 import com.materio.materio_backend.business.service.EquipmentService;
 import com.materio.materio_backend.jpa.entity.Equipment;
 import com.materio.materio_backend.jpa.entity.EquipmentRef;
@@ -27,6 +28,8 @@ public class EquipmentServiceImpl implements EquipmentService {
     private EquipmentRefRepository equipmentRefRepo;
     @Autowired
     private EquipmentRepository equipmentRepo;
+    @Autowired
+    private EquipmentRefService equipmentRefService;
 
     public void createEquipment(EquipmentBO equipmentBO) {
         System.out.println("Recherche de la salle : " + Constants.ROOM_STOCKAGE);
@@ -35,15 +38,9 @@ public class EquipmentServiceImpl implements EquipmentService {
                 .orElseThrow(() -> new RoomNotFoundException(Constants.ROOM_STOCKAGE));
 
         EquipmentRef equipmentRef = equipmentRefRepo.findByName(equipmentBO.getReferenceName())
-                .orElseGet(() -> {
-                    EquipmentRef newRef = new EquipmentRef();
-                    newRef.setName(equipmentBO.getReferenceName());
-                    newRef.setQuantity(0);
-                    return equipmentRefRepo.save(newRef);
-                });
+                .orElseGet(() -> equipmentRefService.createNewEquipmentRef(equipmentBO));
 
-        equipmentRef.setQuantity(equipmentRef.getQuantity() + equipmentBO.getQuantity());
-        equipmentRefRepo.save(equipmentRef);
+
 
         for (int i = 0; i < equipmentBO.getQuantity(); i++) {
             Equipment equipment = new Equipment();

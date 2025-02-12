@@ -20,7 +20,6 @@ public class EquipmentTransfer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "L'id de l'equipement transféré est obligatoire")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "equipment_id", referencedColumnName = "id")
     @ToString.Exclude
@@ -31,18 +30,15 @@ public class EquipmentTransfer {
     private String equipmentName;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @NotBlank(message = "La salle de provenance est obligatoire")
-    @JoinColumn(name = "from_room", referencedColumnName = "name")
+    @JoinColumn(name = "from_room", referencedColumnName = "name", nullable = false)
     @ToString.Exclude
     private Room fromRoom;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @NotBlank(message = "La salle de destination est obligatoire")
-    @JoinColumn(name = "to_room", referencedColumnName = "name")
+    @JoinColumn(name = "to_room", referencedColumnName = "name", nullable = false)
     @ToString.Exclude
     private Room toRoom;
 
-    @NotBlank(message = "La date de transfert est obligatoire (LocalDateTime)")
     @Column(name = "transfer_date")
     private LocalDateTime transferDate;
 
