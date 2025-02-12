@@ -1,5 +1,9 @@
 package com.materio.materio_backend.business.service.impl;
 
+import com.materio.materio_backend.Constants;
+import com.materio.materio_backend.business.exception.EquipmentLocationMismatchException;
+import com.materio.materio_backend.business.exception.EquipmentNotFoundException;
+import com.materio.materio_backend.business.exception.RoomNotFoundException;
 import com.materio.materio_backend.business.service.EquipmentTransferService;
 import com.materio.materio_backend.jpa.entity.Equipment;
 import com.materio.materio_backend.jpa.entity.EquipmentTransfer;
@@ -37,7 +41,7 @@ public class EquipmentTransferServiceImpl implements EquipmentTransferService {
 
         // On vérifie si la salle cible existe
         Room targetRoom = roomRepo.findByName(request.getTargetRoomName())
-                .orElseThrow(() -> new RuntimeException("La salle" + request.getTargetRoomName() + "n'existe pas"));
+                .orElseThrow(() -> new RoomNotFoundException(request.getTargetRoomName()));
 
         //Si elle existe, on transfert chaque equipement vers la salle saisie
         List<EquipmentTransfer> equipments = new ArrayList<>();
@@ -58,16 +62,19 @@ public class EquipmentTransferServiceImpl implements EquipmentTransferService {
     private EquipmentTransfer transferSingleEquipment(EquipementVO equipmentVO, Room targetRoom, LocalDateTime now, String transferDetails) {
         // On vérifie si l'equipement est présent en base
         Equipment equipment = equipmentRepo.findById(equipmentVO.getId())
-                .orElseThrow(() -> new RuntimeException("L'equipement " + equipmentVO.getId() + "n'est pas présent en base"));
+                .orElseThrow(() -> new EquipmentNotFoundException(equipmentVO.getReferenceName() + " id : " + equipmentVO.getId()));
 
         // On vérifie si la salle à laquelle est rattachée l'equipement existe
         Room sourceRoom = roomRepo.findByName(equipmentVO.getRoomName())
-                .orElseThrow(() -> new RuntimeException( "L'equipement " + equipmentVO.getReferenceName() + "n'est rattaché à aucune salle :" + equipmentVO.getRoomName()));
+                .orElseThrow(() -> new RoomNotFoundException(equipmentVO.getRoomName()));
 
         // On vérifie que l'equipement est bien rattaché à la salle source en bdd
         if (!equipment.getRoom().getId().equals(sourceRoom.getId())) {
-            throw new RuntimeException("L'équipement " + equipmentVO.getReferenceName()
-                    + " n'est pas dans la salle " + equipmentVO.getRoomName());
+            throw new EquipmentLocationMismatchException(
+                    equipmentVO.getReferenceName(),
+                    equipmentVO.getRoomName(),
+                    equipment.getRoom().getName()
+            );
         }
 
         // On créé le transfert
@@ -90,3 +97,4 @@ public class EquipmentTransferServiceImpl implements EquipmentTransferService {
     }
 
 }
+

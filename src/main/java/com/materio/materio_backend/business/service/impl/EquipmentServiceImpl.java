@@ -3,6 +3,7 @@ package com.materio.materio_backend.business.service.impl;
 import com.materio.materio_backend.Constants;
 import com.materio.materio_backend.business.BO.EquipmentBO;
 import com.materio.materio_backend.business.BO.RoomBO;
+import com.materio.materio_backend.business.exception.RoomNotFoundException;
 import com.materio.materio_backend.business.service.EquipmentService;
 import com.materio.materio_backend.jpa.entity.Equipment;
 import com.materio.materio_backend.jpa.entity.EquipmentRef;
@@ -31,7 +32,7 @@ public class EquipmentServiceImpl implements EquipmentService {
         System.out.println("Recherche de la salle : " + Constants.ROOM_STOCKAGE);
 
         Room stockage = roomRepo.findByName(Constants.ROOM_STOCKAGE)
-                .orElseThrow(() -> new RuntimeException("La salle de stockage n'existe pas !"));
+                .orElseThrow(() -> new RoomNotFoundException(Constants.ROOM_STOCKAGE));
 
         EquipmentRef equipmentRef = equipmentRefRepo.findByName(equipmentBO.getReferenceName())
                 .orElseGet(() -> {
