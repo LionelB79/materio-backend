@@ -1,13 +1,16 @@
 package com.materio.materio_backend.jpa.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @Table(name = "t_room")
 public class Room extends BaseEntity {
@@ -16,12 +19,8 @@ public class Room extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-
     @Column(name = "name", nullable = false, unique = true)
     private String name;
 
-
-    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
-    private List<Equipment> equipements;
 
 }

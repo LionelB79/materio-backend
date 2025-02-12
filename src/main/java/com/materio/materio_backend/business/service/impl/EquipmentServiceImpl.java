@@ -10,12 +10,14 @@ import com.materio.materio_backend.jpa.entity.Room;
 import com.materio.materio_backend.jpa.repository.EquipmentRefRepository;
 import com.materio.materio_backend.jpa.repository.EquipmentRepository;
 import com.materio.materio_backend.jpa.repository.RoomRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 @Service
+@Transactional
 public class EquipmentServiceImpl implements EquipmentService {
 
     @Autowired
@@ -48,8 +50,12 @@ public class EquipmentServiceImpl implements EquipmentService {
             equipment.setMark(equipmentBO.getMark());
             equipment.setReferenceName(equipmentBO.getReferenceName());
             equipment.setRoom(stockage);
+
+
+
             equipmentRepo.save(equipment);
         }
+        roomRepo.save(stockage);
     }
 
 }

@@ -1,0 +1,49 @@
+
+Rooms
+{
+    "name": "Stockage"
+},
+{
+    "name": "Salle 1"
+},
+{
+    "name": "Salle 2"
+}
+
+
+Equiments
+{
+    "referenceName":"Ecran",
+    "mark": "Dell",
+    "description": "Ecran pour ordinateur fixe",
+    "quantity":2
+},
+{
+    "referenceName":"PC",
+    "mark": "",
+    "description": "PC de l'agences de Poitiers",
+    "quantity":5
+}
+
+Transfer
+{
+    "targetRoomName": "Salle 1",
+    "equipements" : [
+        {
+            "id": 1,
+            "referenceName":"Ecran",
+            "mark": "Dell",
+            "description": "Ecran pour ordinateur fixe",
+            "quantity":2,
+            "roomName" : "Stockage"
+        },
+        {
+            "id": 2,
+                "referenceName":"Ecran",
+                "mark": "Dell",
+                "description": "Ecran pour ordinateur fixe",
+                "quantity":2
+        }
+        ],
+    "details": "PI de fin de journée"
+}

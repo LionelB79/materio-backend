@@ -2,10 +2,13 @@ package com.materio.materio_backend.jpa.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @Table(name = "t_equipment")
 public class Equipment extends BaseEntity {
@@ -24,8 +27,7 @@ public class Equipment extends BaseEntity {
     private String description;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "room_id", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "room_name", referencedColumnName = "name", nullable = false)
     private Room room;
-
 
 }
