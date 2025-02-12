@@ -52,8 +52,6 @@ public class EquipmentServiceImpl implements EquipmentService {
             equipment.setReferenceName(equipmentBO.getReferenceName());
             equipment.setRoom(stockage);
 
-
-
             equipmentRepo.save(equipment);
         }
         roomRepo.save(stockage);

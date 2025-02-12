@@ -1,6 +1,8 @@
 package com.materio.materio_backend.jpa.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,12 +19,16 @@ public class Equipment extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+
+    @NotBlank(message = "Le nom de référence est obligatoire")
     @JoinColumn(name = "reference_name", referencedColumnName="name",nullable = false)
     private String referenceName;
 
+    @Size(max = 100)
     @Column(name = "mark", nullable = true)
     private String mark;
 
+    @Size(max = 500)
     @Column(name = "description", nullable = true)
     private String description;
 

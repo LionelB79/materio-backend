@@ -17,7 +17,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return problemDetail;
     }
 
-    @ExceptionHandler(RoomNotFoundException.class)
+    @ExceptionHandler(EquipmentNotFoundException.class)
     ProblemDetail handleEquipmentNotFoundException(EquipmentNotFoundException e) {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
                 HttpStatus.NOT_FOUND,

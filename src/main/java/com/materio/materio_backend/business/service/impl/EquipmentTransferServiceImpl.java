@@ -1,6 +1,5 @@
 package com.materio.materio_backend.business.service.impl;
 
-import com.materio.materio_backend.Constants;
 import com.materio.materio_backend.business.exception.EquipmentLocationMismatchException;
 import com.materio.materio_backend.business.exception.EquipmentNotFoundException;
 import com.materio.materio_backend.business.exception.RoomNotFoundException;
@@ -11,11 +10,9 @@ import com.materio.materio_backend.jpa.entity.Room;
 import com.materio.materio_backend.jpa.repository.EquipmentRepository;
 import com.materio.materio_backend.jpa.repository.EquipmentTransferRepository;
 import com.materio.materio_backend.jpa.repository.RoomRepository;
-import com.materio.materio_backend.converter.impl.TransferConverterImpl;
 import com.materio.materio_backend.view.VO.EquipementVO;
 import com.materio.materio_backend.view.VO.TransferRequestVO;
 import jakarta.transaction.Transactional;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,8 +28,7 @@ public class EquipmentTransferServiceImpl implements EquipmentTransferService {
     private RoomRepository roomRepo;
     @Autowired
     private EquipmentRepository equipmentRepo;
-    @Autowired
-    private TransferConverterImpl transferConverter;
+
     @Autowired
     private EquipmentTransferRepository equipmentTransferRepo;
 
