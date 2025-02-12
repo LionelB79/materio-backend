@@ -18,6 +18,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 @Service
 @Transactional
 public class EquipmentServiceImpl implements EquipmentService {
@@ -31,7 +34,7 @@ public class EquipmentServiceImpl implements EquipmentService {
     @Autowired
     private EquipmentRefService equipmentRefService;
 
-    public void createEquipment(EquipmentBO equipmentBO) {
+    public void createEquipments(EquipmentBO equipmentBO) {
         System.out.println("Recherche de la salle : " + Constants.ROOM_STOCKAGE);
 
         Room stockage = roomRepo.findByName(Constants.ROOM_STOCKAGE)
@@ -40,18 +43,22 @@ public class EquipmentServiceImpl implements EquipmentService {
         EquipmentRef equipmentRef = equipmentRefRepo.findByName(equipmentBO.getReferenceName())
                 .orElseGet(() -> equipmentRefService.createNewEquipmentRef(equipmentBO));
 
+        List<Equipment> newEquipments = IntStream.range(0, equipmentBO.getQuantity())
+                .mapToObj(i -> createSingleEquipment(stockage, equipmentBO))
+                .toList();
+
+        equipmentRepo.saveAll(newEquipments);
+    }
 
 
-        for (int i = 0; i < equipmentBO.getQuantity(); i++) {
-            Equipment equipment = new Equipment();
-            equipment.setDescription(equipmentBO.getDescription());
-            equipment.setMark(equipmentBO.getMark());
-            equipment.setReferenceName(equipmentBO.getReferenceName());
-            equipment.setRoom(stockage);
+    private Equipment createSingleEquipment(Room stockage, EquipmentBO equipmentBO) {
+        Equipment equipment = new Equipment();
+        equipment.setDescription(equipmentBO.getDescription());
+        equipment.setMark(equipmentBO.getMark());
+        equipment.setReferenceName(equipmentBO.getReferenceName());
+        equipment.setRoom(stockage);
 
-            equipmentRepo.save(equipment);
-        }
-        roomRepo.save(stockage);
+       return equipment;
     }
 
 }

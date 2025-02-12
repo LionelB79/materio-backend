@@ -20,7 +20,7 @@ public class EquipmentController {
     @PostMapping(value ="/equipment")
     public ResponseEntity<String> createEquipment(@RequestBody EquipmentBO equipmentBO) {
         try {
-            equipmentService.createEquipment(equipmentBO);
+            equipmentService.createEquipments(equipmentBO);
             return ResponseEntity.ok("equipmentBO créé :" + equipmentBO);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();

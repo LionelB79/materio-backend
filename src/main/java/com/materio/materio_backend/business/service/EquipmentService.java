@@ -6,6 +6,6 @@ import com.materio.materio_backend.jpa.entity.Equipment;
 import java.util.List;
 
 public interface EquipmentService {
-    void createEquipment(EquipmentBO equipmentBO);
+    void createEquipments(EquipmentBO equipmentBO);
 
 }
