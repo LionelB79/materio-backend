@@ -1,5 +1,6 @@
-package com.materio.materio_backend.business.BO;
+package com.materio.materio_backend.dto.RoomDTO;
 
+import com.materio.materio_backend.dto.Equipment.EquipmentBO;
 import lombok.*;
 
 import java.util.List;

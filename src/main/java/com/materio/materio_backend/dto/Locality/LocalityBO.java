@@ -1,4 +1,4 @@
-package com.materio.materio_backend.business.BO;
+package com.materio.materio_backend.dto.Locality;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -1,4 +1,4 @@
-package com.materio.materio_backend.view.VO;
+package com.materio.materio_backend.dto.Transfer;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,12 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class EquipementVO {
-    private Long id;
+public class EquipmentTransfertDTO {
     private String referenceName;
-    private String mark;
-    private String description;
+    private String serialNumber;
     private String roomName;
-    private int quantity;
-
 }
