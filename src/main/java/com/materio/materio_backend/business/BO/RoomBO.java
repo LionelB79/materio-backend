@@ -11,5 +11,6 @@ import java.util.List;
 @NoArgsConstructor
 public class RoomBO {
     private String name;
+    private String localityName;
     private List<EquipmentBO> equipments;
 }

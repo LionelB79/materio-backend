@@ -1,6 +1,7 @@
 package com.materio.materio_backend.jpa.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -28,4 +29,9 @@ public class Room extends BaseEntity {
 
     @OneToMany(mappedBy = "room", fetch = FetchType.LAZY)
     private Set<Equipment> equipments = new HashSet<>();
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "locality_id", nullable = false)
+    @JsonIgnoreProperties("rooms")
+    private Locality locality;
 }

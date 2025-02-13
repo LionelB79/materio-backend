@@ -36,4 +36,17 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         problemDetail.setTitle("Localisation d'équipement incorrecte");
         return problemDetail;
     }
+
+    @ExceptionHandler(LocalityNotFoundException.class)
+    ProblemDetail handleLocalityNotFoundException(LocalityNotFoundException e) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.CONFLICT,
+                e.getMessage()
+        );
+        problemDetail.setTitle("Localisation d'équipement incorrecte");
+        return problemDetail;
+    }
+
+
+
 }
