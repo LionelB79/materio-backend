@@ -24,7 +24,7 @@ public class Locality extends BaseEntity {
 
     @NotBlank(message = "L'adress est obligatoire")
     @Size(max = 100, message = "L'adresse ne peut pas dépasser 100 caractères")
-    @Column(name="adress")
+    @Column(name="address")
     private String address;
 
     @NotNull(message = "Le code postal est obligatoire")

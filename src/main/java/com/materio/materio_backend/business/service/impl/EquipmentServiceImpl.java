@@ -1,8 +1,7 @@
 package com.materio.materio_backend.business.service.impl;
 
 import com.materio.materio_backend.Constants;
-import com.materio.materio_backend.business.BO.EquipmentBO;
-import com.materio.materio_backend.business.BO.RoomBO;
+import com.materio.materio_backend.business.exception.DuplicateEquipmentException;
 import com.materio.materio_backend.business.exception.RoomNotFoundException;
 import com.materio.materio_backend.business.service.EquipmentRefService;
 import com.materio.materio_backend.business.service.EquipmentService;
@@ -16,13 +15,8 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
 @Service
-@Transactional
+@Transactional(rollbackOn = Exception.class)
 public class EquipmentServiceImpl implements EquipmentService {
 
     @Autowired
@@ -34,29 +28,30 @@ public class EquipmentServiceImpl implements EquipmentService {
     @Autowired
     private EquipmentRefService equipmentRefService;
 
-    public void createEquipments(EquipmentBO equipmentBO) {
-        System.out.println("Recherche de la salle : " + Constants.ROOM_STOCKAGE);
+    public Equipment createEquipment(Equipment equipment) {
 
         Room stockage = roomRepo.findByName(Constants.ROOM_STOCKAGE)
                 .orElseThrow(() -> new RoomNotFoundException(Constants.ROOM_STOCKAGE));
 
-        EquipmentRef equipmentRef = equipmentRefRepo.findByName(equipmentBO.getReferenceName())
-                .orElseGet(() -> equipmentRefService.createNewEquipmentRef(equipmentBO));
+        EquipmentRef equipmentRef = equipmentRefRepo.findByName(equipment.getReferenceName())
+                .orElseGet(() -> equipmentRefService.createNewEquipmentRef(equipment));
 
-        List<Equipment> newEquipments = IntStream.range(0, equipmentBO.getQuantity())
-                .mapToObj(i -> createSingleEquipment(stockage, equipmentBO))
-                .toList();
+        equipmentRef.setQuantity(equipmentRef.getQuantity()+1);
 
-        equipmentRepo.saveAll(newEquipments);
+        Equipment newEquipment = createSingleEquipment(stockage, equipment);
+
+        return equipmentRepo.save(newEquipment);
     }
 
 
-    private Equipment createSingleEquipment(Room stockage, EquipmentBO equipmentBO) {
-        Equipment equipment = new Equipment();
-        equipment.setDescription(equipmentBO.getDescription());
-        equipment.setMark(equipmentBO.getMark());
-        equipment.setReferenceName(equipmentBO.getReferenceName());
-        equipment.setRoom(stockage);
+    private Equipment createSingleEquipment(Room stockage, Equipment equipment) {
+
+        //On vérifie si l'equipement est déjà en base
+        String serialNumber = equipment.getSerialNumber();
+        equipmentRepo.findBySerialNumberAndReferenceName(serialNumber, equipment.getReferenceName())
+                .ifPresent(e -> {
+                    throw new DuplicateEquipmentException( equipment.getReferenceName(),equipment.getSerialNumber() );
+                });
 
        return equipment;
     }

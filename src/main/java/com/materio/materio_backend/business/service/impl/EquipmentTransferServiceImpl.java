@@ -10,8 +10,8 @@ import com.materio.materio_backend.jpa.entity.Room;
 import com.materio.materio_backend.jpa.repository.EquipmentRepository;
 import com.materio.materio_backend.jpa.repository.EquipmentTransferRepository;
 import com.materio.materio_backend.jpa.repository.RoomRepository;
-import com.materio.materio_backend.view.VO.EquipementVO;
-import com.materio.materio_backend.view.VO.TransferRequestVO;
+import com.materio.materio_backend.dto.Transfer.EquipmentTransfertDTO;
+import com.materio.materio_backend.dto.Transfer.TransferRequestDTO;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-@Transactional
+@Transactional(rollbackOn = Exception.class)
 public class EquipmentTransferServiceImpl implements EquipmentTransferService {
 
     @Autowired
@@ -33,7 +33,7 @@ public class EquipmentTransferServiceImpl implements EquipmentTransferService {
     private EquipmentTransferRepository equipmentTransferRepo;
 
     @Override
-    public List<EquipmentTransfer> processTransfer(TransferRequestVO request) {
+    public List<EquipmentTransfer> processTransfer(TransferRequestDTO request) {
 
         // On vérifie si la salle cible existe
         Room targetRoom = roomRepo.findByName(request.getTargetRoomName())
@@ -51,10 +51,10 @@ public class EquipmentTransferServiceImpl implements EquipmentTransferService {
 
     }
 
-    private EquipmentTransfer transferSingleEquipment(EquipementVO equipmentVO, Room targetRoom, LocalDateTime now, String transferDetails) {
+    private EquipmentTransfer transferSingleEquipment(EquipmentTransfertDTO equipmentVO, Room targetRoom, LocalDateTime now, String transferDetails) {
         // On vérifie si l'equipement est présent en base
-        Equipment equipment = equipmentRepo.findById(equipmentVO.getId())
-                .orElseThrow(() -> new EquipmentNotFoundException(equipmentVO.getReferenceName() + " id : " + equipmentVO.getId()));
+        Equipment equipment = equipmentRepo.findBySerialNumberAndReferenceName(equipmentVO.getSerialNumber(), equipmentVO.getReferenceName())
+                .orElseThrow(() -> new EquipmentNotFoundException(equipmentVO.getReferenceName() + " Numéro de série : " + equipmentVO.getSerialNumber()));
 
         // On vérifie si la salle à laquelle est rattachée l'equipement existe
         Room sourceRoom = roomRepo.findByName(equipmentVO.getRoomName())
@@ -71,9 +71,8 @@ public class EquipmentTransferServiceImpl implements EquipmentTransferService {
 
         // On créé le transfert
         EquipmentTransfer equipmentTransfer = new EquipmentTransfer();
-        equipmentTransfer.setEquipmentName(equipment.getReferenceName());
+        equipmentTransfer.setEquipment(equipment);
         equipmentTransfer.setTransferDate(now);
-        equipmentTransfer.setEquipmentId(equipment);
         equipmentTransfer.setFromRoom(equipment.getRoom());
         equipmentTransfer.setToRoom(targetRoom);
         equipmentTransfer.setDetails(transferDetails);

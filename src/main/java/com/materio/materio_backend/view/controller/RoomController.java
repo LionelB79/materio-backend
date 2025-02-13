@@ -1,8 +1,9 @@
 package com.materio.materio_backend.view.controller;
 
-import com.materio.materio_backend.business.BO.RoomBO;
+import com.materio.materio_backend.dto.RoomDTO.RoomBO;
 import com.materio.materio_backend.jpa.entity.Room;
 import com.materio.materio_backend.business.service.RoomService;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 
 
@@ -24,7 +25,7 @@ public class RoomController {
     private RoomService roomService;
 
     @PostMapping(value ="/room", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Room> createRoom(@RequestBody RoomBO roomBO) {
+    public ResponseEntity<Room> createRoom(@Valid @RequestBody RoomBO roomBO) {
         try {
             Room createdRoom = roomService.createRoom(roomBO);
             return ResponseEntity.ok(createdRoom);
@@ -33,5 +34,3 @@ public class RoomController {
         }
     }
 }
-
-

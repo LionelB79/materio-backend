@@ -1,8 +1,9 @@
 package com.materio.materio_backend.business.service.impl;
 
-import com.materio.materio_backend.business.BO.LocalityBO;
+import com.materio.materio_backend.business.exception.DuplicateLocalityException;
 import com.materio.materio_backend.business.exception.LocalityNotFoundException;
 import com.materio.materio_backend.business.service.LocalityService;
+import com.materio.materio_backend.dto.Locality.LocalityBO;
 import com.materio.materio_backend.jpa.entity.Locality;
 import com.materio.materio_backend.jpa.repository.LocalityRepository;
 import jakarta.transaction.Transactional;
@@ -10,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-@Transactional
+@Transactional(rollbackOn = Exception.class)
 public class LocalityServiceImpl implements LocalityService {
 
     @Autowired
@@ -20,7 +21,7 @@ public class LocalityServiceImpl implements LocalityService {
     public Locality createLocality(LocalityBO localityBO) {
         localityRepo.findByName(localityBO.getName())
                 .ifPresent(l -> {
-                    throw new RuntimeException("La localité '\" + localityBO.getName() + \"' existe déjà");
+                    throw new DuplicateLocalityException(localityBO.getName());
                 });
         Locality locality = new Locality();
         locality.setName(localityBO.getName());

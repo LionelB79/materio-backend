@@ -10,33 +10,32 @@ import lombok.ToString;
 
 import java.time.LocalDateTime;
 
+
 @Entity
 @Getter
 @Setter
-@ToString
 @Table(name = "t_transfer")
-public class EquipmentTransfer {
+public class EquipmentTransfer extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "equipment_id", referencedColumnName = "id")
-    @ToString.Exclude
-    private Equipment equipmentId;
-
-    @NotBlank(message = "Le nom de l'equipement transféré est obligatoire")
-    @Column(name = "equipment_name")
-    private String equipmentName;
+    @JoinColumns({
+            // L'ordre des colonnes doit correspondre à l'ordre dans EquipmentPK
+            @JoinColumn(name = "equipment_reference_name",
+                    referencedColumnName = "equipment_reference_name"),
+            @JoinColumn(name = "equipment_serial_number",
+                    referencedColumnName = "equipment_serial_number")
+    })
+    private Equipment equipment;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "from_room", referencedColumnName = "name", nullable = false)
-    @ToString.Exclude
+    @JoinColumn(name = "from_room", referencedColumnName = "name")
     private Room fromRoom;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "to_room", referencedColumnName = "name", nullable = false)
-    @ToString.Exclude
+    @JoinColumn(name = "to_room", referencedColumnName = "name")
     private Room toRoom;
 
     @Column(name = "transfer_date")
@@ -45,4 +44,6 @@ public class EquipmentTransfer {
     @Size(max = 1000)
     @Column(name = "transfer_details")
     private String details;
+
+
 }
