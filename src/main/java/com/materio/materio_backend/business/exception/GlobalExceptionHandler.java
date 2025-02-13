@@ -1,5 +1,9 @@
 package com.materio.materio_backend.business.exception;
 
+import com.materio.materio_backend.business.exception.equipment.DuplicateEquipmentException;
+import com.materio.materio_backend.business.exception.equipment.EquipmentNotFoundException;
+import com.materio.materio_backend.business.exception.room.RoomNotEmptyException;
+import com.materio.materio_backend.business.exception.room.RoomNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -66,6 +70,16 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 e.getMessage()
         );
         problemDetail.setTitle("Localité déjà existante");
+        return problemDetail;
+    }
+
+    @ExceptionHandler(RoomNotEmptyException.class)
+    ProblemDetail handleRoomNotEmptyException(RoomNotEmptyException e) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.CONFLICT,
+                e.getMessage()
+        );
+        problemDetail.setTitle("Salle non vide");
         return problemDetail;
     }
 

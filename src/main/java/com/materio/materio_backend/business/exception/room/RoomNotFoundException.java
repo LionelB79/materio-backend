@@ -1,4 +1,4 @@
-package com.materio.materio_backend.business.exception;
+package com.materio.materio_backend.business.exception.room;
 
 public class RoomNotFoundException extends RuntimeException {
     public RoomNotFoundException(String roomName) {

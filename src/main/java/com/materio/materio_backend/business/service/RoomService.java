@@ -7,5 +7,7 @@ public interface RoomService {
 
     Room createRoom(RoomBO roomBO);
 
+    void deleteRoom(RoomBO roomBO);
+
 
 }

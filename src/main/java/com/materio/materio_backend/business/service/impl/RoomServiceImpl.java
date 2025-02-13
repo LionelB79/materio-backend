@@ -1,5 +1,7 @@
 package com.materio.materio_backend.business.service.impl;
 
+import com.materio.materio_backend.business.exception.room.RoomNotEmptyException;
+import com.materio.materio_backend.business.exception.room.RoomNotFoundException;
 import com.materio.materio_backend.dto.RoomDTO.RoomBO;
 import com.materio.materio_backend.jpa.entity.Locality;
 import com.materio.materio_backend.jpa.entity.Room;
@@ -19,7 +21,6 @@ public class RoomServiceImpl implements RoomService {
     LocalityServiceImpl localityService;
 
     @Override
-    @Transactional
     public Room createRoom(RoomBO roomBO) {
         roomRepo.findByName(roomBO.getName())
                 .ifPresent(r -> {
@@ -31,6 +32,18 @@ public class RoomServiceImpl implements RoomService {
         room.setName(roomBO.getName());
         room.setLocality(locality);
         return roomRepo.save(room);
+    }
+
+    public void deleteRoom(RoomBO roomBO) {
+       Room room = roomRepo.findByName(roomBO.getName())
+               .orElseThrow(() -> new RoomNotFoundException(roomBO.getName()));
+
+        if (!room.getEquipments().isEmpty()) {
+            throw new RoomNotEmptyException(roomBO.getName());
+        }
+
+       roomRepo.delete(room);
+
     }
 
 }

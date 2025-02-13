@@ -11,20 +11,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping(value = "/api", produces = MediaType.APPLICATION_JSON_VALUE)
 public class RoomController {
     private static final Logger logger = LoggerFactory.getLogger(RoomController.class);
 
     @Autowired
     private RoomService roomService;
 
-    @PostMapping(value ="/room", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value ="/room")
     public ResponseEntity<Room> createRoom(@Valid @RequestBody RoomBO roomBO) {
         try {
             Room createdRoom = roomService.createRoom(roomBO);
@@ -32,5 +29,14 @@ public class RoomController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
+    }
+
+    @DeleteMapping(value = "/room")
+    public ResponseEntity<String> deleteRoom(@Valid @RequestBody RoomBO roomBO) {
+
+            roomService.deleteRoom(roomBO);
+            return ResponseEntity.ok("La salle " + roomBO + " a été supprimée");
+
+
     }
 }

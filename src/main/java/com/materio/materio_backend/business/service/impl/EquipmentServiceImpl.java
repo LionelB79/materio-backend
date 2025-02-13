@@ -1,8 +1,8 @@
 package com.materio.materio_backend.business.service.impl;
 
 import com.materio.materio_backend.Constants;
-import com.materio.materio_backend.business.exception.DuplicateEquipmentException;
-import com.materio.materio_backend.business.exception.RoomNotFoundException;
+import com.materio.materio_backend.business.exception.equipment.DuplicateEquipmentException;
+import com.materio.materio_backend.business.exception.room.RoomNotFoundException;
 import com.materio.materio_backend.business.service.EquipmentRefService;
 import com.materio.materio_backend.business.service.EquipmentService;
 import com.materio.materio_backend.jpa.entity.Equipment;

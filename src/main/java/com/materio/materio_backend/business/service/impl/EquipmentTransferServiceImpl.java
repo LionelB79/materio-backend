@@ -1,8 +1,8 @@
 package com.materio.materio_backend.business.service.impl;
 
 import com.materio.materio_backend.business.exception.EquipmentLocationMismatchException;
-import com.materio.materio_backend.business.exception.EquipmentNotFoundException;
-import com.materio.materio_backend.business.exception.RoomNotFoundException;
+import com.materio.materio_backend.business.exception.equipment.EquipmentNotFoundException;
+import com.materio.materio_backend.business.exception.room.RoomNotFoundException;
 import com.materio.materio_backend.business.service.EquipmentTransferService;
 import com.materio.materio_backend.jpa.entity.Equipment;
 import com.materio.materio_backend.jpa.entity.EquipmentTransfer;
