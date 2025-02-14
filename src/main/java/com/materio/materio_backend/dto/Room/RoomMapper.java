@@ -21,7 +21,6 @@ public class RoomMapper {
         roomVO.setName(room.getName());
         roomVO.setLocalityName(room.getLocality().getName());
 
-
         // Conversion des équipements
         if (null !=room.getEquipments()) {
             roomVO.setEquipments(room.getEquipments().stream()

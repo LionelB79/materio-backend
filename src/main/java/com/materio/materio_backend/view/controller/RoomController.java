@@ -15,6 +15,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping(value = "/api", produces = MediaType.APPLICATION_JSON_VALUE)
 public class RoomController {
@@ -27,21 +29,25 @@ public class RoomController {
 
     @PostMapping(value ="/room")
     public ResponseEntity<RoomVO> createRoom(@Valid @RequestBody RoomBO roomBO) {
-        try {
+
             Room createdRoom = roomService.createRoom(roomBO);
             return ResponseEntity.ok(roomMapper.entityToVO(createdRoom));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
+
     }
 
-    @DeleteMapping(value = "/room")
-    public ResponseEntity<String> deleteRoom(@Valid @RequestBody RoomBO roomBO) {
+    @DeleteMapping(value = "/room/{roomName}")
+    public ResponseEntity<String> deleteRoom(@PathVariable String roomName) {
 
-            roomService.deleteRoom(roomBO);
+            roomService.deleteRoom(roomName);
+            return ResponseEntity.ok("La salle " + roomName + " a été supprimée");
 
-            return ResponseEntity.ok("La salle " + roomBO + " a été supprimée");
+    }
 
+    @GetMapping(value = "/rooms")
+    public ResponseEntity<List<RoomVO>> getRooms(@RequestParam String localityName) {
+         List<Room> rooms = roomService.getRooms(localityName);
 
+        return ResponseEntity.ok(rooms.stream()
+                 .map(room -> roomMapper.entityToVO(room)).toList());
     }
 }
