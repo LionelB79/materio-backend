@@ -2,7 +2,7 @@ package com.materio.materio_backend.business.service.impl;
 
 import com.materio.materio_backend.business.exception.room.RoomNotEmptyException;
 import com.materio.materio_backend.business.exception.room.RoomNotFoundException;
-import com.materio.materio_backend.dto.RoomDTO.RoomBO;
+import com.materio.materio_backend.dto.Room.RoomBO;
 import com.materio.materio_backend.jpa.entity.Locality;
 import com.materio.materio_backend.jpa.entity.Room;
 import com.materio.materio_backend.business.service.RoomService;

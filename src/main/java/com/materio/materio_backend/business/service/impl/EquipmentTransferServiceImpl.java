@@ -73,8 +73,8 @@ public class EquipmentTransferServiceImpl implements EquipmentTransferService {
         EquipmentTransfer equipmentTransfer = new EquipmentTransfer();
         equipmentTransfer.setEquipment(equipment);
         equipmentTransfer.setTransferDate(now);
-        equipmentTransfer.setFromRoom(equipment.getRoom());
-        equipmentTransfer.setToRoom(targetRoom);
+        equipmentTransfer.setFromRoom(equipment.getRoom().getName());
+        equipmentTransfer.setToRoom(targetRoom.getName());
         equipmentTransfer.setDetails(transferDetails);
 
         equipmentTransferRepo.save(equipmentTransfer);

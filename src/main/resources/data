@@ -1,28 +1,42 @@
+Locality :
+{
+    "name": "Agence CGI Bessines",
+    "address": "3 Rue Thomas Portau",
+    "cp": "79000",
+    "city": "Niort"
+}
 
 Rooms
 {
-    "name": "Stockage"
-},
-{
-    "name": "Salle 1"
-},
-{
-    "name": "Salle 2"
+    "name": "Stockage",
+    "localityName": "Agence CGI Bessines"
 }
+{
+    "name": "Salle 1",
+    "localityName": "Agence CGI Bessines"
+}
+{
+    "name": "Salle 2",
+    "localityName": "Agence CGI Bessines"
 
+}
 
 Equiments
 {
-    "referenceName":"Ecran",
-    "mark": "Dell",
-    "description": "Ecran pour ordinateur fixe",
-    "quantity":2
+    "referenceName": "PC",
+    "mark": "DELL",
+    "description": "",
+    "serialNumber": "12345",
+    "purchaseDate": "2018-02-05T12:59:11",
+    "roomName":"Stockage"
 },
 {
-    "referenceName":"PC",
-    "mark": "",
-    "description": "PC de l'agences de Poitiers",
-    "quantity":5
+    "referenceName": "Clavier",
+    "mark": "Roccat",
+    "description": "Clavier lumineux",
+    "serialNumber": "12345",
+    "purchaseDate": "2018-03-05T12:59:11",
+    "roomName":"Stockage"
 }
 
 Transfer
@@ -30,19 +44,15 @@ Transfer
     "targetRoomName": "Salle 1",
     "equipements" : [
         {
-            "id": 1,
-            "referenceName":"Ecran",
-            "mark": "Dell",
-            "description": "Ecran pour ordinateur fixe",
-            "quantity":2,
+            "referenceName":"PC",
+            "serialNumber":12345,
             "roomName" : "Stockage"
         },
         {
             "id": 2,
-                "referenceName":"Ecran",
-                "mark": "Dell",
-                "description": "Ecran pour ordinateur fixe",
-                "quantity":2
+                "referenceName":"Clavier",
+                "serialNumber":12345,
+            "roomName" : "Stockage"
         }
         ],
     "details": "PI de fin de journée"

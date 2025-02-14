@@ -30,13 +30,11 @@ public class EquipmentTransfer extends BaseEntity {
     })
     private Equipment equipment;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "from_room", referencedColumnName = "name")
-    private Room fromRoom;
+    @Column(name = "from_room")
+    private String fromRoom;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "to_room", referencedColumnName = "name")
-    private Room toRoom;
+    @Column(name = "to_room")
+    private String toRoom;
 
     @Column(name = "transfer_date")
     private LocalDateTime transferDate;

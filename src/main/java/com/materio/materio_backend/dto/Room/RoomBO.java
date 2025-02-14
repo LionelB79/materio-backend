@@ -1,4 +1,4 @@
-package com.materio.materio_backend.dto.RoomDTO;
+package com.materio.materio_backend.dto.Room;
 
 import com.materio.materio_backend.dto.Equipment.EquipmentBO;
 import lombok.*;
