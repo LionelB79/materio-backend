@@ -1,7 +1,7 @@
 package com.materio.materio_backend.business.service.impl;
 
-import com.materio.materio_backend.business.exception.DuplicateLocalityException;
-import com.materio.materio_backend.business.exception.LocalityNotFoundException;
+import com.materio.materio_backend.business.exception.locality.DuplicateLocalityException;
+import com.materio.materio_backend.business.exception.locality.LocalityNotFoundException;
 import com.materio.materio_backend.business.service.LocalityService;
 import com.materio.materio_backend.dto.Locality.LocalityBO;
 import com.materio.materio_backend.jpa.entity.Locality;
