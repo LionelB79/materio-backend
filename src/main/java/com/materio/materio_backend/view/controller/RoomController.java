@@ -2,6 +2,8 @@ package com.materio.materio_backend.view.controller;
 
 import com.materio.materio_backend.dto.Locality.LocalityBO;
 import com.materio.materio_backend.dto.Room.RoomBO;
+import com.materio.materio_backend.dto.Room.RoomMapper;
+import com.materio.materio_backend.dto.Room.RoomVO;
 import com.materio.materio_backend.jpa.entity.Room;
 import com.materio.materio_backend.business.service.RoomService;
 import jakarta.validation.Valid;
@@ -24,14 +26,15 @@ public class RoomController {
     @Autowired
     private RoomService roomService;
 
+    @Autowired private RoomMapper roomMapper;
+
     @PostMapping(value ="/room")
-    public ResponseEntity<Room> createRoom(@Valid @RequestBody RoomBO roomBO) {
-        try {
+    public ResponseEntity<RoomVO> createRoom(@Valid @RequestBody RoomBO roomBO) {
+
             Room createdRoom = roomService.createRoom(roomBO);
-            return ResponseEntity.ok(createdRoom);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
+            RoomVO createdRoomVO = roomMapper.EntityToVO(createdRoom);
+            return ResponseEntity.ok(createdRoomVO);
+
     }
 
     @DeleteMapping(value = "/room/{roomName}")
@@ -42,8 +45,14 @@ public class RoomController {
     }
 
     @GetMapping(value = "/rooms")
-    public ResponseEntity<List<Room>> getAllRooms(@RequestParam String localityName) {
+    public ResponseEntity<List<RoomVO>> getAllRooms(@RequestParam String localityName) {
         List<Room> rooms = roomService.getRoomsByLocality(localityName);
-        return ResponseEntity.ok(rooms);
+        List<RoomVO> roomsVO = rooms.stream()
+                .map(room -> roomMapper.EntityToVO(room))
+                .toList();
+
+        return ResponseEntity.ok(roomsVO);
     }
+
+
 }
