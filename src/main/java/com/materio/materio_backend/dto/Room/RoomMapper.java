@@ -1,12 +1,41 @@
-package com.materio.materio_backend.dto.RoomDTO;
+package com.materio.materio_backend.dto.Room;
 
-import com.materio.materio_backend.jpa.repository.LocalityRepository;
+import com.materio.materio_backend.dto.Equipment.EquipmentMapper;
+import com.materio.materio_backend.jpa.entity.Room;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+import java.util.stream.Collectors;
+
+@Component
 public class RoomMapper {
 
-@Autowired
-    LocalityRepository localityRepository;
+    @Autowired
+    EquipmentMapper equipmentMapper;
 
+    public Room BOtoEntity(RoomBO roomBO) {
+        Room room = new Room();
+        room.setName(room.getName());
+        room.setLocality(room.getLocality());
 
+        if (!room.getEquipments().isEmpty()) {
+            room.setEquipments(roomBO.getEquipments().stream()
+                    .map(equipment -> equipmentMapper.BOToEntity(equipment))
+                    .collect(Collectors.toSet()));
+        }
+        return room;
+    }
+
+    public RoomVO EntityToVO(Room room) {
+        RoomVO roomVO = new RoomVO();
+        roomVO.setName(room.getName());
+        roomVO.setLocalityName(room.getLocality().getName());
+
+        if (!room.getEquipments().isEmpty()) {
+            roomVO.setEquipments(room.getEquipments().stream()
+                    .map(equipment -> equipmentMapper.EntityToVO(equipment))
+                    .collect(Collectors.toSet()));
+        }
+        return roomVO;
+    }
 }

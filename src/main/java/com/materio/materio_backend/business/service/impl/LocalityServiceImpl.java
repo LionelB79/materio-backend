@@ -48,7 +48,7 @@ public class LocalityServiceImpl implements LocalityService {
     public Locality updateLocality(String name, LocalityBO localityBO) {
         Locality locality = getLocalityByName(name);
 
-        // Si le nom change, vérifier qu'il n'existe pas déjà
+        // Si le nom change, on vérifie qu'il n'existe pas déjà
         if (!locality.getName().equals(localityBO.getName())) {
             localityRepo.findByName(localityBO.getName())
                     .ifPresent(l -> {
@@ -64,7 +64,7 @@ public class LocalityServiceImpl implements LocalityService {
     public void deleteLocality(String name) {
         Locality locality = getLocalityByName(name);
 
-        // Vérifier si des salles contiennent des équipements
+        // On vérifie si des salles contiennent des équipements
         boolean hasEquipment = locality.getRooms().stream()
                 .anyMatch(room -> !room.getEquipments().isEmpty());
 

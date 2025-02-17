@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 import java.util.List;
+import java.util.Set;
 
 
 @Getter
@@ -21,5 +22,5 @@ public class RoomBO {
     private String localityName;
 
 
-    private List<EquipmentBO> equipments;
+    private Set<EquipmentBO> equipments;
 }
