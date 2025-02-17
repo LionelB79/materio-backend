@@ -13,16 +13,17 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api")
 public class EquipmentController {
-@Autowired private EquipmentService equipmentService;
-@Autowired private EquipmentMapper equipmentMapper;
+    @Autowired
+    private EquipmentService equipmentService;
+    @Autowired
+    private EquipmentMapper equipmentMapper;
 
-    @PostMapping(value ="/equipment")
+    @PostMapping(value = "/equipment")
     public ResponseEntity<String> createEquipment(@Valid @RequestBody EquipmentBO equipmentBO) {
 
-        Equipment equipment = equipmentMapper.BOToEntity(equipmentBO);
-            Equipment newEquipment = equipmentService.createEquipment(equipment);
+        Equipment newEquipment = equipmentService.createEquipment(equipmentBO);
         EquipmentVO response = equipmentMapper.EntityToVO(newEquipment);
-            return ResponseEntity.ok("equipmentBO créé :" + response);
+        return ResponseEntity.ok("equipmentBO créé :" + response);
 
     }
 

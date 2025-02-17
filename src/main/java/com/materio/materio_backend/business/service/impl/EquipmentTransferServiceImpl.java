@@ -3,6 +3,7 @@ package com.materio.materio_backend.business.service.impl;
 import com.materio.materio_backend.business.exception.EquipmentLocationMismatchException;
 import com.materio.materio_backend.business.exception.equipment.EquipmentNotFoundException;
 import com.materio.materio_backend.business.exception.room.RoomNotFoundException;
+import com.materio.materio_backend.business.service.EquipmentService;
 import com.materio.materio_backend.business.service.EquipmentTransferService;
 import com.materio.materio_backend.business.service.RoomService;
 import com.materio.materio_backend.jpa.entity.Equipment;
@@ -31,6 +32,9 @@ public class EquipmentTransferServiceImpl implements EquipmentTransferService {
     private EquipmentRepository equipmentRepo;
 
     @Autowired
+    private EquipmentService equipmentService;
+
+    @Autowired
     private EquipmentTransferRepository equipmentTransferRepo;
 
     @Override
@@ -53,8 +57,8 @@ public class EquipmentTransferServiceImpl implements EquipmentTransferService {
 
     private EquipmentTransfer transferSingleEquipment(EquipmentTransfertDTO equipmentVO, Room targetRoom, LocalDateTime now, String transferDetails) {
         // On vérifie si l'equipement est présent en base
-        Equipment equipment = equipmentRepo.findBySerialNumberAndReferenceName(equipmentVO.getSerialNumber(), equipmentVO.getReferenceName())
-                .orElseThrow(() -> new EquipmentNotFoundException(equipmentVO.getReferenceName() + " Numéro de série : " + equipmentVO.getSerialNumber()));
+        Equipment equipment = equipmentService.getEquipment(equipmentVO.getSerialNumber(), equipmentVO.getReferenceName());
+
 
         // On vérifie si la salle à laquelle est rattachée l'equipement existe
         Room sourceRoom = roomService.getRoom(equipmentVO.getRoomName());
