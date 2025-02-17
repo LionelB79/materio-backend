@@ -2,9 +2,11 @@ package com.materio.materio_backend.business.service.impl;
 
 import com.materio.materio_backend.Constants;
 import com.materio.materio_backend.business.exception.equipment.DuplicateEquipmentException;
+import com.materio.materio_backend.business.exception.equipment.EquipmentNotFoundException;
 import com.materio.materio_backend.business.exception.room.RoomNotFoundException;
 import com.materio.materio_backend.business.service.EquipmentRefService;
 import com.materio.materio_backend.business.service.EquipmentService;
+import com.materio.materio_backend.business.service.RoomService;
 import com.materio.materio_backend.jpa.entity.Equipment;
 import com.materio.materio_backend.jpa.entity.EquipmentRef;
 import com.materio.materio_backend.jpa.entity.Room;
@@ -20,9 +22,7 @@ import org.springframework.stereotype.Service;
 public class EquipmentServiceImpl implements EquipmentService {
 
     @Autowired
-    private RoomRepository roomRepo;
-    @Autowired
-    private EquipmentRefRepository equipmentRefRepo;
+    private RoomService roomService;
     @Autowired
     private EquipmentRepository equipmentRepo;
     @Autowired
@@ -30,17 +30,18 @@ public class EquipmentServiceImpl implements EquipmentService {
 
     public Equipment createEquipment(Equipment equipment) {
 
-        Room stockage = roomRepo.findByName(Constants.ROOM_STOCKAGE)
-                .orElseThrow(() -> new RoomNotFoundException(Constants.ROOM_STOCKAGE));
+        Room stockage = roomService.getRoom(Constants.ROOM_STOCKAGE);
 
-        EquipmentRef equipmentRef = equipmentRefRepo.findByName(equipment.getReferenceName())
-                .orElseGet(() -> equipmentRefService.createNewEquipmentRef(equipment));
-
-        equipmentRef.setQuantity(equipmentRef.getQuantity()+1);
+        EquipmentRef equipmentRef = equipmentRefService.getOrCreateReference(equipment.getReferenceName());
 
         Equipment newEquipment = createSingleEquipment(stockage, equipment);
 
         return equipmentRepo.save(newEquipment);
+    }
+
+    public Equipment getEquipment(String serialNumber, String referenceName) {
+        return equipmentRepo.findBySerialNumberAndReferenceName(serialNumber, referenceName)
+                .orElseThrow(() -> new EquipmentNotFoundException(referenceName));
     }
 
 
@@ -57,6 +58,7 @@ public class EquipmentServiceImpl implements EquipmentService {
 
        return equipment;
     }
+
 
 }
 
