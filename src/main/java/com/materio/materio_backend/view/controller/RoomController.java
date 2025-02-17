@@ -1,8 +1,7 @@
 package com.materio.materio_backend.view.controller;
 
 import com.materio.materio_backend.dto.Locality.LocalityBO;
-import com.materio.materio_backend.dto.RoomDTO.RoomBO;
-import com.materio.materio_backend.jpa.entity.Locality;
+import com.materio.materio_backend.dto.Room.RoomBO;
 import com.materio.materio_backend.jpa.entity.Room;
 import com.materio.materio_backend.business.service.RoomService;
 import jakarta.validation.Valid;
@@ -35,16 +34,16 @@ public class RoomController {
         }
     }
 
-    @DeleteMapping(value = "/room")
-    public ResponseEntity<String> deleteRoom(@Valid @RequestBody RoomBO roomBO) {
+    @DeleteMapping(value = "/room/{roomName}")
+    public ResponseEntity<String> deleteRoom(@PathVariable String roomName) {
 
-            roomService.deleteRoom(roomBO);
-            return ResponseEntity.ok("La salle " + roomBO + " a été supprimée");
+            roomService.deleteRoom(roomName);
+            return ResponseEntity.ok("La salle " + roomName + " a été supprimée");
     }
 
     @GetMapping(value = "/rooms")
-    public ResponseEntity<List<Room>> getAllRooms(@Valid @RequestBody LocalityBO localityBO) {
-        List<Room> rooms = roomService.getAllRooms(localityBO.getName());
+    public ResponseEntity<List<Room>> getAllRooms(@RequestParam String localityName) {
+        List<Room> rooms = roomService.getRoomsByLocality(localityName);
         return ResponseEntity.ok(rooms);
     }
 }

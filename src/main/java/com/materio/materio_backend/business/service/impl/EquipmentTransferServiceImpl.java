@@ -4,6 +4,7 @@ import com.materio.materio_backend.business.exception.EquipmentLocationMismatchE
 import com.materio.materio_backend.business.exception.equipment.EquipmentNotFoundException;
 import com.materio.materio_backend.business.exception.room.RoomNotFoundException;
 import com.materio.materio_backend.business.service.EquipmentTransferService;
+import com.materio.materio_backend.business.service.RoomService;
 import com.materio.materio_backend.jpa.entity.Equipment;
 import com.materio.materio_backend.jpa.entity.EquipmentTransfer;
 import com.materio.materio_backend.jpa.entity.Room;
@@ -25,7 +26,7 @@ import java.util.List;
 public class EquipmentTransferServiceImpl implements EquipmentTransferService {
 
     @Autowired
-    private RoomRepository roomRepo;
+    private RoomService roomService;
     @Autowired
     private EquipmentRepository equipmentRepo;
 
@@ -36,8 +37,7 @@ public class EquipmentTransferServiceImpl implements EquipmentTransferService {
     public List<EquipmentTransfer> processTransfer(TransferRequestDTO request) {
 
         // On vérifie si la salle cible existe
-        Room targetRoom = roomRepo.findByName(request.getTargetRoomName())
-                .orElseThrow(() -> new RoomNotFoundException(request.getTargetRoomName()));
+        Room targetRoom = roomService.getRoom(request.getTargetRoomName());
 
         //Si elle existe, on transfert chaque equipement vers la salle saisie
         List<EquipmentTransfer> equipments = new ArrayList<>();
@@ -57,8 +57,7 @@ public class EquipmentTransferServiceImpl implements EquipmentTransferService {
                 .orElseThrow(() -> new EquipmentNotFoundException(equipmentVO.getReferenceName() + " Numéro de série : " + equipmentVO.getSerialNumber()));
 
         // On vérifie si la salle à laquelle est rattachée l'equipement existe
-        Room sourceRoom = roomRepo.findByName(equipmentVO.getRoomName())
-                .orElseThrow(() -> new RoomNotFoundException(equipmentVO.getRoomName()));
+        Room sourceRoom = roomService.getRoom(equipmentVO.getRoomName());
 
         // On vérifie que l'equipement est bien rattaché à la salle source en bdd
         if (!equipment.getRoom().getId().equals(sourceRoom.getId())) {

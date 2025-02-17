@@ -20,9 +20,9 @@ public class EquipmentTransferController {
 
     @Autowired private EquipmentTransferService equipmentTransferService;
     @PostMapping(value = "/transfer", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> transfert(@Valid @RequestBody TransferRequestDTO transferRequestVO) {
+    public ResponseEntity<String> transfert(@Valid @RequestBody TransferRequestDTO transferRequestDTO) {
 
-            List<EquipmentTransfer> equipmentTransfers = equipmentTransferService.processTransfer(transferRequestVO);
+            List<EquipmentTransfer> equipmentTransfers = equipmentTransferService.processTransfer(transferRequestDTO);
             return ResponseEntity.ok("Transfert effectué : " + equipmentTransfers);
 
 
