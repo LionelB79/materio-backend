@@ -1,5 +1,6 @@
 package com.materio.materio_backend.jpa.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -35,6 +36,7 @@ public class Equipment extends BaseEntity {
  @Column(name = "description")
  private String description;
 
+ @JsonBackReference("room-equipments")
  @ManyToOne(optional = false, fetch = FetchType.LAZY)
  @JoinColumn(name = "room_name", referencedColumnName = "name", nullable = false)
  private Room room;
