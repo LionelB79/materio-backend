@@ -2,6 +2,8 @@ package com.materio.materio_backend.business.exception;
 
 import com.materio.materio_backend.business.exception.equipment.DuplicateEquipmentException;
 import com.materio.materio_backend.business.exception.equipment.EquipmentNotFoundException;
+import com.materio.materio_backend.business.exception.locality.DuplicateLocalityException;
+import com.materio.materio_backend.business.exception.locality.LocalityNotFoundException;
 import com.materio.materio_backend.business.exception.room.RoomNotEmptyException;
 import com.materio.materio_backend.business.exception.room.RoomNotFoundException;
 import org.springframework.http.HttpStatus;

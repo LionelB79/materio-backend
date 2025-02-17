@@ -13,6 +13,7 @@ public class EquipmentMapper {
         equipment.setPurchaseDate(request.getPurchaseDate());
         equipment.setMark(request.getMark());
         equipment.setDescription(request.getDescription());
+
         return equipment;
     }
 

@@ -53,6 +53,8 @@ public class EquipmentServiceImpl implements EquipmentService {
                     throw new DuplicateEquipmentException( equipment.getReferenceName(),equipment.getSerialNumber() );
                 });
 
+        equipment.setRoom(stockage);
+
        return equipment;
     }
 

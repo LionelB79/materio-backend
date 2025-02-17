@@ -1,4 +1,4 @@
-package com.materio.materio_backend.business.exception;
+package com.materio.materio_backend.business.exception.locality;
 
 public class LocalityNotFoundException extends RuntimeException {
     public LocalityNotFoundException(String message) {
