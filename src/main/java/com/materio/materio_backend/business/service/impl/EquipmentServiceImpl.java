@@ -28,6 +28,9 @@ public class EquipmentServiceImpl implements EquipmentService {
     @Autowired
     private EquipmentRefService equipmentRefService;
 
+    @Autowired
+    private EquipmentRefRepository equipmentRefRepo;
+
     public Equipment createEquipment(Equipment equipment) {
 
         Room stockage = roomService.getRoom(Constants.ROOM_STOCKAGE);
@@ -59,6 +62,18 @@ public class EquipmentServiceImpl implements EquipmentService {
        return equipment;
     }
 
+    @Override
+    public void deleteEquipment(String serialNumber, String referenceName) {
+        // Récupérer l'équipement
+        Equipment equipment = equipmentRepo.findBySerialNumberAndReferenceName(serialNumber, referenceName)
+                .orElseThrow(() -> new EquipmentNotFoundException(referenceName + " (SN: " + serialNumber + ")"));
+
+        // Décrémenter la quantité de la référence
+        equipmentRefService.decrementQuantity(referenceName);
+
+        // Supprimer l'équipement
+        equipmentRepo.delete(equipment);
+    }
 
 }
 

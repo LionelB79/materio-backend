@@ -4,5 +4,5 @@ import com.materio.materio_backend.jpa.entity.Equipment;
 
 public interface EquipmentService {
     Equipment createEquipment(Equipment equipment);
-
+    void deleteEquipment(String serialNumber, String referenceName);
 }
