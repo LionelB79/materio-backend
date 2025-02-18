@@ -85,4 +85,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return problemDetail;
     }
 
+    @ExceptionHandler(InvalidQuantityException.class)
+    ProblemDetail handleInvalidQuantityException(InvalidQuantityException e) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.CONFLICT,
+                e.getMessage()
+        );
+        problemDetail.setTitle("Salle non vide");
+        return problemDetail;
+    }
+
 }

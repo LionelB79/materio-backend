@@ -39,15 +39,14 @@ public class EquipmentTransferServiceImpl implements EquipmentTransferService {
     private EquipmentTransferRepository equipmentTransferRepo;
 
     @Override
-    public List<EquipmentTransfer> processTransfer(String locality, TransferRequestDTO request) {
+    public List<EquipmentTransfer> processTransfer(final String locality, final TransferRequestDTO request) {
 
         // On vérifie si la salle cible existe
-        Room targetRoom = roomService.getRoom(locality,request.getTargetRoomName());
+        final Room targetRoom = roomService.getRoom(locality,request.getTargetRoomName());
 
         //Si elle existe, on transfert chaque equipement vers la salle saisie
-        List<EquipmentTransfer> equipments = new ArrayList<>();
-        LocalDateTime now = LocalDateTime.now();
-        String transferDetails = request.getDetails();
+        final LocalDateTime now = LocalDateTime.now();
+        final String transferDetails = request.getDetails();
 
 
          return request.getEquipments().stream()
@@ -56,14 +55,14 @@ public class EquipmentTransferServiceImpl implements EquipmentTransferService {
 
     }
 
-    private EquipmentTransfer transferSingleEquipment(EquipmentTransfertDTO equipmentVO, Room targetRoom, LocalDateTime now, String transferDetails) {
+    private EquipmentTransfer transferSingleEquipment(final EquipmentTransfertDTO equipmentVO, final Room targetRoom, final LocalDateTime now, final String transferDetails) {
         // On vérifie si l'equipement est présent en base
-        Equipment equipment = equipmentService.getEquipment(equipmentVO.getSerialNumber(), equipmentVO.getReferenceName());
+        final Equipment equipment = equipmentService.getEquipment(equipmentVO.getSerialNumber(), equipmentVO.getReferenceName());
 
-        Locality locality = equipment.getRoom().getLocality();
+        final Locality locality = equipment.getRoom().getLocality();
 
         // On vérifie si la salle à laquelle est rattachée l'equipement existe
-        Room sourceRoom = roomService.getRoom(locality.getName(), equipmentVO.getRoomName());
+        final Room sourceRoom = roomService.getRoom(locality.getName(), equipmentVO.getRoomName());
 
         // On vérifie que l'equipement est bien rattaché à la salle source en bdd
         if (!equipment.getRoom().getId().equals(sourceRoom.getId())) {
@@ -75,7 +74,7 @@ public class EquipmentTransferServiceImpl implements EquipmentTransferService {
         }
 
         // On créé le transfert
-        EquipmentTransfer equipmentTransfer = new EquipmentTransfer();
+        final EquipmentTransfer equipmentTransfer = new EquipmentTransfer();
         equipmentTransfer.setEquipment(equipment);
         equipmentTransfer.setTransferDate(now);
         equipmentTransfer.setFromRoom(equipment.getRoom().getName());

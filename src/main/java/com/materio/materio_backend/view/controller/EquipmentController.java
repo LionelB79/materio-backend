@@ -21,16 +21,16 @@ public class EquipmentController {
     @PostMapping(value = "/equipment")
     public ResponseEntity<String> createEquipment(@Valid @RequestBody EquipmentBO equipmentBO) {
 
-        Equipment newEquipment = equipmentService.createEquipment(equipmentBO);
-        EquipmentVO response = equipmentMapper.EntityToVO(newEquipment);
+        final Equipment newEquipment = equipmentService.createEquipment(equipmentBO);
+        final EquipmentVO response = equipmentMapper.EntityToVO(newEquipment);
         return ResponseEntity.ok("equipmentBO créé :" + response);
 
     }
 
     @DeleteMapping("/equipment/{referenceName}/{serialNumber}")
     public ResponseEntity<String> deleteEquipment(
-            @PathVariable String referenceName,
-            @PathVariable String serialNumber) {
+            @PathVariable final String referenceName,
+            @PathVariable final String serialNumber) {
 
         equipmentService.deleteEquipment(serialNumber, referenceName);
         return ResponseEntity.ok("equipment supprimé avec succès :" + referenceName);

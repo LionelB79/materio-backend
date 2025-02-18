@@ -35,29 +35,29 @@ public class EquipmentServiceImpl implements EquipmentService {
     LocalityService localityService;
 
     @Override
-    public Equipment createEquipment(EquipmentBO equipmentBO) {
+    public Equipment createEquipment(final EquipmentBO equipmentBO) {
 
-        Locality locality = localityService.getLocalityByName(equipmentBO.getRoomName());
+        final Locality locality = localityService.getLocalityByName(equipmentBO.getRoomName());
 
-        Room stockage = roomService.getRoom( locality.getName(), Constants.ROOM_STOCKAGE);
+        final Room stockage = roomService.getRoom( locality.getName(), Constants.ROOM_STOCKAGE);
 
-        EquipmentRef equipmentRef = equipmentRefService.getOrCreateReference(equipmentBO.getReferenceName());
+        final EquipmentRef equipmentRef = equipmentRefService.getOrCreateReference(equipmentBO.getReferenceName());
 
-        Equipment newEquipment = createSingleEquipment(stockage, equipmentBO);
+        final Equipment newEquipment = createSingleEquipment(stockage, equipmentBO);
 
         return equipmentRepo.save(newEquipment);
     }
 
-    private Equipment createSingleEquipment(Room stockage, EquipmentBO equipmentBO) {
+    private Equipment createSingleEquipment(final Room stockage, final EquipmentBO equipmentBO) {
 
         //On vérifie si l'equipement est déjà en base
-        String serialNumber = equipmentBO.getSerialNumber();
+        final String serialNumber = equipmentBO.getSerialNumber();
         equipmentRepo.findBySerialNumberAndReferenceName(serialNumber, equipmentBO.getReferenceName())
                 .ifPresent(e -> {
                     throw new DuplicateEquipmentException(equipmentBO.getReferenceName(), equipmentBO.getSerialNumber());
                 });
 
-        Equipment equipment = new Equipment();
+        final Equipment equipment = new Equipment();
         equipment.setSerialNumber(equipmentBO.getSerialNumber());
         equipment.setReferenceName(equipmentBO.getReferenceName());
         equipment.setPurchaseDate(equipmentBO.getPurchaseDate());
@@ -69,15 +69,15 @@ public class EquipmentServiceImpl implements EquipmentService {
         return equipment;
     }
     @Override
-    public Equipment getEquipment(String serialNumber, String referenceName) {
+    public Equipment getEquipment(final String serialNumber, final String referenceName) {
         return equipmentRepo.findBySerialNumberAndReferenceName(serialNumber, referenceName)
                 .orElseThrow(() -> new EquipmentNotFoundException(referenceName));
     }
 
     @Override
-    public void deleteEquipment(String serialNumber, String referenceName) {
+    public void deleteEquipment(final String serialNumber, final String referenceName) {
         // On récupère l'équipement
-        Equipment equipment = getEquipment(serialNumber, referenceName);
+        final Equipment equipment = getEquipment(serialNumber, referenceName);
 
         // On décrémente la ref de l'equipement supprimé
         equipmentRefService.decrementQuantity(referenceName);
@@ -86,11 +86,9 @@ public class EquipmentServiceImpl implements EquipmentService {
     }
 
     @Override
-    public Equipment updateEquipment(String locality, EquipmentBO equipmentBO) {
+    public Equipment updateEquipment(final String locality, final EquipmentBO equipmentBO) {
 
-
-
-        Equipment equipment = getEquipment(equipmentBO.getSerialNumber(), equipmentBO.getReferenceName());
+        final Equipment equipment = getEquipment(equipmentBO.getSerialNumber(), equipmentBO.getReferenceName());
         equipment.setPurchaseDate(equipmentBO.getPurchaseDate());
         equipment.setDescription(equipmentBO.getDescription());
         equipment.setMark(equipmentBO.getMark());

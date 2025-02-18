@@ -14,37 +14,38 @@ import org.springframework.stereotype.Service;
 public class EquipmentRefServiceImpl implements EquipmentRefService {
 
     @Autowired
-    EquipmentRefRepository equipmentRefRepo;
+    private EquipmentRefRepository equipmentRefRepo;
 
-    public EquipmentRef getOrCreateReference(String referenceName) {
+    @Override
+    public EquipmentRef getOrCreateReference(final String referenceName) {
         return equipmentRefRepo.findByName(referenceName)
                 .map(this::incrementQuantity)
                 .orElseGet(() -> createNewReference(referenceName));
     }
 
     @Override
-    public EquipmentRef getReference(String referenceName) {
+    public EquipmentRef getReference(final String referenceName) {
         return equipmentRefRepo.findByName(referenceName)
                 .orElseThrow(() -> new ReferenceNotFoundException(referenceName));
     }
 
-    private EquipmentRef incrementQuantity(EquipmentRef ref) {
+    private EquipmentRef incrementQuantity(final EquipmentRef ref) {
         ref.setQuantity(ref.getQuantity() + 1);
         return equipmentRefRepo.save(ref);
     }
 
-    private EquipmentRef createNewReference(String referenceName) {
-        var newRef = new EquipmentRef();
+    private EquipmentRef createNewReference(final String referenceName) {
+        final EquipmentRef newRef = new EquipmentRef();
         newRef.setName(referenceName);
         newRef.setQuantity(1);
         return equipmentRefRepo.save(newRef);
     }
 
     @Override
-    public void decrementQuantity(String referenceName) {
-        EquipmentRef ref = getReference(referenceName);
+    public void decrementQuantity(final String referenceName) {
+        final EquipmentRef ref = getReference(referenceName);
         if (ref.getQuantity() <= 0) {
-            throw new InvalidQuantityException("La quantité ne peut pas être négative pour la référence : " + referenceName);
+            throw new InvalidQuantityException(referenceName);
         }
         ref.setQuantity(ref.getQuantity() - 1);
         equipmentRefRepo.save(ref);

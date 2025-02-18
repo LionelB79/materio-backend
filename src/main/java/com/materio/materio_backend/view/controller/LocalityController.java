@@ -24,10 +24,10 @@ public class LocalityController {
     LocalityMapper localityMapper;
 
     @PostMapping(value = "/locality", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<LocalityVO> createLocality(@Valid @RequestBody LocalityBO localityBO) {
+    public ResponseEntity<LocalityVO> createLocality(@Valid @RequestBody final LocalityBO localityBO) {
 
-        Locality createdLocality = localityService.createLocality(localityBO);
-        LocalityVO createdLocalityVO = localityMapper.EntityToVO(createdLocality);
+        final Locality createdLocality = localityService.createLocality(localityBO);
+        final LocalityVO createdLocalityVO = localityMapper.EntityToVO(createdLocality);
         return ResponseEntity.ok(createdLocalityVO);
 
     }
@@ -37,8 +37,8 @@ public class LocalityController {
             @PathVariable String name,
             @Valid @RequestBody LocalityBO localityBO) {
 
-        Locality updatedLocality = localityService.updateLocality(name, localityBO);
-        LocalityVO updatedLocalityVO = localityMapper.EntityToVO(updatedLocality);
+        final Locality updatedLocality = localityService.updateLocality(name, localityBO);
+        final LocalityVO updatedLocalityVO = localityMapper.EntityToVO(updatedLocality);
         return ResponseEntity.ok(updatedLocalityVO);
 
     }
@@ -52,16 +52,16 @@ public class LocalityController {
 
     @GetMapping("/locality/{name}")
     public ResponseEntity<LocalityVO> getLocality(@PathVariable String name) {
-        Locality locality = localityService.getLocalityByName(name);
-        LocalityVO localityVO = localityMapper.EntityToVO(locality);
+        final Locality locality = localityService.getLocalityByName(name);
+        final LocalityVO localityVO = localityMapper.EntityToVO(locality);
 
         return ResponseEntity.ok(localityVO);
     }
 
     @GetMapping("/localities")
     public ResponseEntity<List<LocalityVO>> getAllLocalities() {
-        List<Locality> localities = localityService.getAllLocalities();
-        List<LocalityVO> localitiesVO = localities.stream()
+        final List<Locality> localities = localityService.getAllLocalities();
+        final List<LocalityVO> localitiesVO = localities.stream()
                 .map((locality) -> localityMapper.EntityToVO(locality)
                 ).toList();
         return ResponseEntity.ok(localitiesVO);

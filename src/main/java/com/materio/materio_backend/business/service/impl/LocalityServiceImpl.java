@@ -23,18 +23,18 @@ public class LocalityServiceImpl implements LocalityService {
     private LocalityRepository localityRepo;
 
     @Override
-    public Locality createLocality(LocalityBO localityBO) {
+    public Locality createLocality(final LocalityBO localityBO) {
         localityRepo.findByName(localityBO.getName())
                 .ifPresent(l -> {
                     throw new DuplicateLocalityException(localityBO.getName());
                 });
-        Locality locality = new Locality();
+        final Locality locality = new Locality();
         updateLocalityFields(locality, localityBO);
         return localityRepo.save(locality);
     }
 
     @Override
-    public Locality getLocalityByName(String name) {
+    public Locality getLocalityByName(final String name) {
         return localityRepo.findByName(name)
                 .orElseThrow(() -> new LocalityNotFoundException(name));
     }
@@ -45,7 +45,7 @@ public class LocalityServiceImpl implements LocalityService {
     }
 
     @Override
-    public Locality updateLocality(String name, LocalityBO localityBO) {
+    public Locality updateLocality(final String name, final LocalityBO localityBO) {
         Locality locality = getLocalityByName(name);
 
         // Si le nom change, on vérifie qu'il n'existe pas déjà
@@ -75,7 +75,7 @@ public class LocalityServiceImpl implements LocalityService {
         localityRepo.delete(locality);
     }
 
-    private void updateLocalityFields(Locality locality, LocalityBO localityBO) {
+    private void updateLocalityFields(final Locality locality, final LocalityBO localityBO) {
         locality.setName(localityBO.getName());
         locality.setAddress(localityBO.getAddress());
         locality.setCp(localityBO.getCp());
