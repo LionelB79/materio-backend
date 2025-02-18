@@ -21,14 +21,14 @@ public class LocalityController {
     private LocalityService localityService;
 
     @Autowired
-    LocalityMapper localityMapper;
+    private LocalityMapper localityMapper;
 
     @PostMapping(value = "/locality", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<LocalityVO> createLocality(@Valid @RequestBody final LocalityBO localityBO) {
 
         final Locality createdLocality = localityService.createLocality(localityBO);
-        final LocalityVO createdLocalityVO = localityMapper.EntityToVO(createdLocality);
-        return ResponseEntity.ok(createdLocalityVO);
+
+        return ResponseEntity.ok(localityMapper.EntityToVO(createdLocality));
 
     }
 
@@ -38,8 +38,8 @@ public class LocalityController {
             @Valid @RequestBody LocalityBO localityBO) {
 
         final Locality updatedLocality = localityService.updateLocality(name, localityBO);
-        final LocalityVO updatedLocalityVO = localityMapper.EntityToVO(updatedLocality);
-        return ResponseEntity.ok(updatedLocalityVO);
+
+        return ResponseEntity.ok(localityMapper.EntityToVO(updatedLocality));
 
     }
 
@@ -53,17 +53,16 @@ public class LocalityController {
     @GetMapping("/locality/{name}")
     public ResponseEntity<LocalityVO> getLocality(@PathVariable String name) {
         final Locality locality = localityService.getLocalityByName(name);
-        final LocalityVO localityVO = localityMapper.EntityToVO(locality);
 
-        return ResponseEntity.ok(localityVO);
+        return ResponseEntity.ok(localityMapper.EntityToVO(locality));
     }
 
     @GetMapping("/localities")
     public ResponseEntity<List<LocalityVO>> getAllLocalities() {
         final List<Locality> localities = localityService.getAllLocalities();
-        final List<LocalityVO> localitiesVO = localities.stream()
+
+        return ResponseEntity.ok(localities.stream()
                 .map((locality) -> localityMapper.EntityToVO(locality)
-                ).toList();
-        return ResponseEntity.ok(localitiesVO);
+                ).toList());
     }
 }

@@ -32,9 +32,7 @@ public class RoomController {
     public ResponseEntity<RoomVO> createRoom(@Valid @RequestBody RoomBO roomBO) {
 
             Room createdRoom = roomService.createRoom(roomBO);
-            RoomVO createdRoomVO = roomMapper.EntityToVO(createdRoom);
-            return ResponseEntity.ok(createdRoomVO);
-
+            return ResponseEntity.ok(roomMapper.EntityToVO(createdRoom));
     }
 
     @DeleteMapping(value = "/room/{roomName}")
@@ -47,18 +45,16 @@ public class RoomController {
     @GetMapping(value = "/rooms")
     public ResponseEntity<List<RoomVO>> getAllRooms(@RequestParam String localityName) {
         List<Room> rooms = roomService.getRoomsByLocality(localityName);
-        List<RoomVO> roomsVO = rooms.stream()
-                .map(room -> roomMapper.EntityToVO(room))
-                .toList();
 
-        return ResponseEntity.ok(roomsVO);
+        return ResponseEntity.ok(rooms.stream()
+                .map(room -> roomMapper.EntityToVO(room))
+                .toList());
     }
 
     @GetMapping(value = "/room")
     public ResponseEntity<RoomVO> getRoom(@RequestParam String localityName, @PathVariable String RoomName) {
         Room room = roomService.getRoom(localityName, RoomName);
-        RoomVO roomVO = roomMapper.EntityToVO(room);
 
-        return ResponseEntity.ok(roomVO);
+        return ResponseEntity.ok(roomMapper.EntityToVO(room));
     }
 }
