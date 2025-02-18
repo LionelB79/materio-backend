@@ -7,6 +7,5 @@ public interface EquipmentService {
     Equipment createEquipment(EquipmentBO equipment);
     void deleteEquipment(String serialNumber, String referenceName);
     Equipment getEquipment(String serialNumber, String referenceName);
-    Equipment updateEquipment(EquipmentBO equipmentBO);
-
+    Equipment updateEquipment(String locality, EquipmentBO equipmentBO);
 }

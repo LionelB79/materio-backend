@@ -38,9 +38,9 @@ public class RoomController {
     }
 
     @DeleteMapping(value = "/room/{roomName}")
-    public ResponseEntity<String> deleteRoom(@PathVariable String roomName) {
+    public ResponseEntity<String> deleteRoom(@RequestParam String locality, @PathVariable String roomName) {
 
-            roomService.deleteRoom(roomName);
+            roomService.deleteRoom(locality, roomName);
             return ResponseEntity.ok("La salle " + roomName + " a été supprimée");
     }
 
@@ -54,5 +54,11 @@ public class RoomController {
         return ResponseEntity.ok(roomsVO);
     }
 
+    @GetMapping(value = "/room")
+    public ResponseEntity<RoomVO> getRoom(@RequestParam String localityName, @PathVariable String RoomName) {
+        Room room = roomService.getRoom(localityName, RoomName);
+        RoomVO roomVO = roomMapper.EntityToVO(room);
 
+        return ResponseEntity.ok(roomVO);
+    }
 }

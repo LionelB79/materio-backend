@@ -40,8 +40,8 @@ public class RoomServiceImpl implements RoomService {
         return roomRepo.save(room);
     }
 
-    public void deleteRoom(String roomName) {
-       Room room = getRoom(roomName);
+    public void deleteRoom(String locality, String roomName) {
+       Room room = getRoom(locality, roomName);
 
         if (!room.getEquipments().isEmpty()) {
             throw new RoomNotEmptyException(roomName);
@@ -56,8 +56,8 @@ public class RoomServiceImpl implements RoomService {
 
     }
 
-    public Room getRoom(String name) {
-        return roomRepo.findByName(name)
+    public Room getRoom(String localityName, String name) {
+        return roomRepo.findByNameAndLocality_Name(name, localityName)
                 .orElseThrow(() -> new RoomNotFoundException(name));
     }
 

@@ -9,8 +9,8 @@ public interface RoomService {
 
     Room createRoom(RoomBO roomBO);
 
-    void deleteRoom(String name);
+    void deleteRoom(String locality, String name);
 
     List<Room> getRoomsByLocality(String locality);
-    Room getRoom(String roomName);
+    Room getRoom(String locality, String roomName);
 }

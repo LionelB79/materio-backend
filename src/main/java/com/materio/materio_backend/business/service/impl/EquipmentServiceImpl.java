@@ -7,10 +7,12 @@ import com.materio.materio_backend.business.exception.equipment.EquipmentNotFoun
 import com.materio.materio_backend.business.exception.room.RoomNotFoundException;
 import com.materio.materio_backend.business.service.EquipmentRefService;
 import com.materio.materio_backend.business.service.EquipmentService;
+import com.materio.materio_backend.business.service.LocalityService;
 import com.materio.materio_backend.business.service.RoomService;
 import com.materio.materio_backend.dto.Equipment.EquipmentBO;
 import com.materio.materio_backend.jpa.entity.Equipment;
 import com.materio.materio_backend.jpa.entity.EquipmentRef;
+import com.materio.materio_backend.jpa.entity.Locality;
 import com.materio.materio_backend.jpa.entity.Room;
 import com.materio.materio_backend.jpa.repository.EquipmentRefRepository;
 import com.materio.materio_backend.jpa.repository.EquipmentRepository;
@@ -29,11 +31,15 @@ public class EquipmentServiceImpl implements EquipmentService {
     private EquipmentRepository equipmentRepo;
     @Autowired
     private EquipmentRefService equipmentRefService;
+    @Autowired
+    LocalityService localityService;
 
     @Override
     public Equipment createEquipment(EquipmentBO equipmentBO) {
 
-        Room stockage = roomService.getRoom(Constants.ROOM_STOCKAGE);
+        Locality locality = localityService.getLocalityByName(equipmentBO.getRoomName());
+
+        Room stockage = roomService.getRoom( locality.getName(), Constants.ROOM_STOCKAGE);
 
         EquipmentRef equipmentRef = equipmentRefService.getOrCreateReference(equipmentBO.getReferenceName());
 
@@ -80,13 +86,15 @@ public class EquipmentServiceImpl implements EquipmentService {
     }
 
     @Override
-    public Equipment updateEquipment(EquipmentBO equipmentBO) {
+    public Equipment updateEquipment(String locality, EquipmentBO equipmentBO) {
+
+
 
         Equipment equipment = getEquipment(equipmentBO.getSerialNumber(), equipmentBO.getReferenceName());
         equipment.setPurchaseDate(equipmentBO.getPurchaseDate());
         equipment.setDescription(equipmentBO.getDescription());
         equipment.setMark(equipmentBO.getMark());
-        equipment.setRoom(roomService.getRoom(equipmentBO.getRoomName()));
+        equipment.setRoom(roomService.getRoom(locality,equipmentBO.getRoomName()));
 
 
         return equipmentRepo.save(equipment);

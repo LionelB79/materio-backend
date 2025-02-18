@@ -8,6 +8,7 @@ import com.materio.materio_backend.business.service.EquipmentTransferService;
 import com.materio.materio_backend.business.service.RoomService;
 import com.materio.materio_backend.jpa.entity.Equipment;
 import com.materio.materio_backend.jpa.entity.EquipmentTransfer;
+import com.materio.materio_backend.jpa.entity.Locality;
 import com.materio.materio_backend.jpa.entity.Room;
 import com.materio.materio_backend.jpa.repository.EquipmentRepository;
 import com.materio.materio_backend.jpa.repository.EquipmentTransferRepository;
@@ -38,10 +39,10 @@ public class EquipmentTransferServiceImpl implements EquipmentTransferService {
     private EquipmentTransferRepository equipmentTransferRepo;
 
     @Override
-    public List<EquipmentTransfer> processTransfer(TransferRequestDTO request) {
+    public List<EquipmentTransfer> processTransfer(String locality, TransferRequestDTO request) {
 
         // On vérifie si la salle cible existe
-        Room targetRoom = roomService.getRoom(request.getTargetRoomName());
+        Room targetRoom = roomService.getRoom(locality,request.getTargetRoomName());
 
         //Si elle existe, on transfert chaque equipement vers la salle saisie
         List<EquipmentTransfer> equipments = new ArrayList<>();
@@ -59,9 +60,10 @@ public class EquipmentTransferServiceImpl implements EquipmentTransferService {
         // On vérifie si l'equipement est présent en base
         Equipment equipment = equipmentService.getEquipment(equipmentVO.getSerialNumber(), equipmentVO.getReferenceName());
 
+        Locality locality = equipment.getRoom().getLocality();
 
         // On vérifie si la salle à laquelle est rattachée l'equipement existe
-        Room sourceRoom = roomService.getRoom(equipmentVO.getRoomName());
+        Room sourceRoom = roomService.getRoom(locality.getName(), equipmentVO.getRoomName());
 
         // On vérifie que l'equipement est bien rattaché à la salle source en bdd
         if (!equipment.getRoom().getId().equals(sourceRoom.getId())) {

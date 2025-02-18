@@ -11,5 +11,7 @@ import java.util.Optional;
 @Repository
 public interface RoomRepository extends JpaRepository<Room,Long> {
     Optional<Room> findByName(String name);
+    Optional<Room> findByNameAndLocality_Name(String name, String localityName);
+
     List<Room> findByLocality_Name(String localityName);
 }

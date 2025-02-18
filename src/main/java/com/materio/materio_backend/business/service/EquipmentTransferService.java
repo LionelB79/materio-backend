@@ -6,5 +6,5 @@ import com.materio.materio_backend.dto.Transfer.TransferRequestDTO;
 import java.util.List;
 
 public interface EquipmentTransferService {
-    public List<EquipmentTransfer> processTransfer(TransferRequestDTO transferRequest);
+    public List<EquipmentTransfer> processTransfer(String locality, TransferRequestDTO transferRequest);
 }

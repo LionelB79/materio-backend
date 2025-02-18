@@ -7,10 +7,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -20,9 +17,9 @@ public class EquipmentTransferController {
 
     @Autowired private EquipmentTransferService equipmentTransferService;
     @PostMapping(value = "/transfer", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> transfert(@Valid @RequestBody TransferRequestDTO transferRequestDTO) {
+    public ResponseEntity<String> transfert(@Valid @RequestBody TransferRequestDTO transferRequestDTO, @RequestParam String locality) {
 
-            List<EquipmentTransfer> equipmentTransfers = equipmentTransferService.processTransfer(transferRequestDTO);
+            List<EquipmentTransfer> equipmentTransfers = equipmentTransferService.processTransfer(locality, transferRequestDTO);
             return ResponseEntity.ok("Transfert effectué : " + equipmentTransfers);
 
 
