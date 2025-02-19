@@ -27,7 +27,7 @@ public class RoomServiceImpl implements RoomService {
 
 
     @Override
-    public Room createRoom(final RoomBO roomBO) {
+    public void createRoom(final RoomBO roomBO) {
         roomRepo.findByName(roomBO.getName())
                 .ifPresent(r -> {
                     throw new RuntimeException("La salle est déjà existante"); });
@@ -37,7 +37,8 @@ public class RoomServiceImpl implements RoomService {
         final Room room = new Room();
         room.setName(roomBO.getName());
         room.setLocality(locality);
-        return roomRepo.save(room);
+
+        roomRepo.save(room);
     }
 
     public void deleteRoom(final String locality, final String roomName) {

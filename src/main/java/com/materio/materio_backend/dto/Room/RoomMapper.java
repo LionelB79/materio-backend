@@ -38,4 +38,17 @@ public class RoomMapper {
         }
         return roomVO;
     }
+
+    public RoomBO VOToBO(RoomVO room) {
+        RoomBO roomBO = new RoomBO();
+        roomBO.setName(room.getName());
+        roomBO.setLocalityName(room.getLocalityName());
+
+        if (!room.getEquipments().isEmpty()) {
+            roomBO.setEquipments(room.getEquipments().stream()
+                    .map(equipment -> equipmentMapper.VOToBO(equipment))
+                    .collect(Collectors.toSet()));
+        }
+        return roomBO;
+    }
 }

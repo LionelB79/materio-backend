@@ -26,20 +26,21 @@ public class RoomController {
     @Autowired
     private RoomService roomService;
 
-    @Autowired private RoomMapper roomMapper;
+    @Autowired
+    private RoomMapper roomMapper;
 
-    @PostMapping(value ="/room")
-    public ResponseEntity<RoomVO> createRoom(@Valid @RequestBody RoomBO roomBO) {
+    @PostMapping(value = "/room")
+    public ResponseEntity<String> createRoom(@Valid @RequestBody RoomVO roomVO) {
 
-            Room createdRoom = roomService.createRoom(roomBO);
-            return ResponseEntity.ok(roomMapper.EntityToVO(createdRoom));
+        roomService.createRoom(roomMapper.VOToBO(roomVO));
+        return ResponseEntity.ok("OK");
     }
 
     @DeleteMapping(value = "/room/{roomName}")
     public ResponseEntity<String> deleteRoom(@RequestParam String locality, @PathVariable String roomName) {
 
-            roomService.deleteRoom(locality, roomName);
-            return ResponseEntity.ok("La salle " + roomName + " a été supprimée");
+        roomService.deleteRoom(locality, roomName);
+        return ResponseEntity.ok("La salle " + roomName + " a été supprimée");
     }
 
     @GetMapping(value = "/rooms")
