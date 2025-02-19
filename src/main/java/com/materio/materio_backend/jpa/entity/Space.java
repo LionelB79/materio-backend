@@ -28,7 +28,7 @@ public class Space extends BaseEntity {
     private String name;
 
     @JsonManagedReference("space-zones")
-    @OneToMany(mappedBy = "space", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "space", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Zone> zones = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

@@ -1,12 +1,13 @@
 package com.materio.materio_backend.business.service.impl;
 
-import com.materio.materio_backend.business.exception.room.RoomNotEmptyException;
-import com.materio.materio_backend.business.exception.room.RoomNotFoundException;
-import com.materio.materio_backend.dto.Room.RoomBO;
+import com.materio.materio_backend.business.exception.SpaceHasEquipedZonesException;
+import com.materio.materio_backend.business.exception.space.SpaceNotFoundException;
+import com.materio.materio_backend.dto.Space.SpaceBO;
+import com.materio.materio_backend.dto.Space.SpaceMapper;
 import com.materio.materio_backend.jpa.entity.Locality;
-import com.materio.materio_backend.jpa.entity.Room;
 import com.materio.materio_backend.business.service.SpaceService;
-import com.materio.materio_backend.jpa.repository.RoomRepository;
+import com.materio.materio_backend.jpa.entity.Space;
+import com.materio.materio_backend.jpa.repository.SpaceRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,46 +19,52 @@ import java.util.List;
 public class SpaceServiceImpl implements SpaceService {
 
     @Autowired
-    RoomRepository roomRepo;
+    SpaceRepository spaceRepo;
     @Autowired
     LocalityServiceImpl localityService;
-
+    @Autowired
+    SpaceMapper spaceMapper;
 
 
     @Override
-    public void createRoom(final RoomBO roomBO) {
-        roomRepo.findByName(roomBO.getName())
+    public void createSpace(final SpaceBO spaceBO) {
+        spaceRepo.findByName(spaceBO.getName())
                 .ifPresent(r -> {
                     throw new RuntimeException("La salle est déjà existante"); });
 
-        final Locality locality = localityService.getLocalityByName(roomBO.getLocalityName());
+        final Locality locality = localityService.getLocalityByName(spaceBO.getLocalityName());
 
-        final Room room = new Room();
-        room.setName(roomBO.getName());
+        final Space room = new Space();
+        room.setName(spaceBO.getName());
         room.setLocality(locality);
 
-        roomRepo.save(room);
+        spaceRepo.save(room);
     }
+    @Override
+    public void deleteSpace(final String locality, final String spaceName) {
+        final SpaceBO spaceBO = getSpace(locality, spaceName);
 
-    public void deleteRoom(final String locality, final String roomName) {
-        final Room room = getRoom(locality, roomName);
+        boolean hasEquipment = spaceBO.getZones().stream()
+                .anyMatch(zone -> !zone.getEquipments().isEmpty());
 
-        if (!room.getEquipments().isEmpty()) {
-            throw new RoomNotEmptyException(roomName);
+        if (hasEquipment) {
+            throw new SpaceHasEquipedZonesException(spaceName);
         }
-
-       roomRepo.delete(room);
+        spaceRepo.delete(spaceMapper.boToEntity(spaceBO));
     }
-
-    public List<Room> getRoomsByLocality(String localityName) {
+    @Override
+    public List<SpaceBO> getSpacesByLocality(String localityName) {
         localityService.getLocalityByName(localityName);
-        return roomRepo.findByLocality_Name(localityName);
+       List<Space> spaces =  spaceRepo.findByLocality_Name(localityName);
 
+        return spaces.stream()
+                .map(space -> spaceMapper.entityToBO(space)).toList();
     }
-
-    public Room getRoom(String localityName, String name) {
-        return roomRepo.findByNameAndLocality_Name(name, localityName)
-                .orElseThrow(() -> new RoomNotFoundException(name));
+    @Override
+    public SpaceBO getSpace(String localityName, String name) {
+         Space space = spaceRepo.findByNameAndLocality_Name(name, localityName)
+                .orElseThrow(() -> new SpaceNotFoundException(name));
+        return spaceMapper.entityToBO(space);
     }
 
 }
