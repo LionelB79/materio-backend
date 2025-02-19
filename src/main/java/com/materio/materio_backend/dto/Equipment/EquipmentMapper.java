@@ -29,4 +29,15 @@ public class EquipmentMapper {
         response.setUpdatedAt(equipment.getUpdatedAt().toLocalDate());
         return response;
     }
+
+    public EquipmentBO VOToBO(EquipmentVO request) {
+        EquipmentBO equipment = new EquipmentBO();
+        equipment.setSerialNumber(request.getSerialNumber());
+        equipment.setReferenceName(request.getReferenceName());
+        equipment.setPurchaseDate(request.getPurchaseDate());
+        equipment.setMark(request.getMark());
+        equipment.setDescription(request.getDescription());
+
+        return equipment;
+    }
 }
