@@ -36,10 +36,10 @@ public class Equipment extends BaseEntity {
  @Column(name = "description")
  private String description;
 
- @JsonBackReference("room-equipments")
+ @JsonBackReference("zone-equipments")
  @ManyToOne(optional = false, fetch = FetchType.LAZY)
- @JoinColumn(name = "room_name", referencedColumnName = "name", nullable = false)
- private Room room;
+ @JoinColumn(name = "zone_id", nullable = false)
+ private Zone zone;
 
  @Transient
  public String getSerialNumber() {

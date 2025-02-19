@@ -39,5 +39,5 @@ public class Locality extends BaseEntity {
     private String city;
 
     @OneToMany(mappedBy = "locality", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<Room> rooms = new HashSet<>();
+    private Set<Space> spaces = new HashSet<>();
 }

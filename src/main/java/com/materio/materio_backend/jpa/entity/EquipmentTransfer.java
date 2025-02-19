@@ -22,7 +22,6 @@ public class EquipmentTransfer extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
-            // L'ordre des colonnes doit correspondre à l'ordre dans EquipmentPK
             @JoinColumn(name = "equipment_reference_name",
                     referencedColumnName = "equipment_reference_name"),
             @JoinColumn(name = "equipment_serial_number",
@@ -30,11 +29,11 @@ public class EquipmentTransfer extends BaseEntity {
     })
     private Equipment equipment;
 
-    @Column(name = "from_room")
-    private String fromRoom;
+    @Column(name = "from_zone")
+    private String fromZone;
 
-    @Column(name = "to_room")
-    private String toRoom;
+    @Column(name = "to_zone")
+    private String toZone;
 
     @Column(name = "transfer_date")
     private LocalDateTime transferDate;
