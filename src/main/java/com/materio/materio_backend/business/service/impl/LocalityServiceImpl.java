@@ -61,17 +61,20 @@ public class LocalityServiceImpl implements LocalityService {
     }
 
     @Override
-    public void deleteLocality(String name) {
-        Locality locality = getLocalityByName(name);
+    public void deleteLocality(String localityName) {
+        Locality locality = getLocalityByName(localityName);
 
-        // On vérifie si des salles contiennent des équipements
-        boolean hasEquipment = locality.getRooms().stream()
-                .anyMatch(room -> !room.getEquipments().isEmpty());
+        // On vérifie si des zones dans les espaces contiennent des équipements
+        boolean hasEquipment = locality.getSpaces().stream()
+                .flatMap(space -> space.getZones().stream())
+                .anyMatch(zone -> !zone.getEquipments().isEmpty());
 
         if (hasEquipment) {
-            throw new LocalityNotEmptyException(name);
+            throw new LocalityNotEmptyException(localityName);
         }
 
+        // Si pas d'équipements, on peut supprimer la hiérarchie complète
+        // La suppression se fera en cascade grâce aux annotations JPA
         localityRepo.delete(locality);
     }
 

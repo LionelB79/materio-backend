@@ -1,6 +1,6 @@
 package com.materio.materio_backend.dto.Locality;
 
-import com.materio.materio_backend.dto.Room.RoomVO;
+import com.materio.materio_backend.dto.Space.SpaceVO;
 import lombok.Data;
 
 import java.util.List;
@@ -11,5 +11,5 @@ public class LocalityVO {
     private String address;
     private Integer cp;
     private String city;
-    private List<RoomVO> rooms;
+    private List<SpaceVO> rooms;
 }

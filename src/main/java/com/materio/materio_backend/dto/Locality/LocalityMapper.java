@@ -1,5 +1,5 @@
 package com.materio.materio_backend.dto.Locality;
-import com.materio.materio_backend.dto.Room.RoomMapper;
+import com.materio.materio_backend.dto.Space.SpaceMapper;
 import com.materio.materio_backend.jpa.entity.Locality;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 public class LocalityMapper {
 
     @Autowired
-    RoomMapper roomMapper;
+    SpaceMapper roomMapper;
     public Locality BOToEntity(LocalityBO request) {
         Locality locality = new Locality();
         locality.setName(request.getName());

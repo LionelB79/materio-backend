@@ -4,8 +4,8 @@ import com.materio.materio_backend.business.exception.equipment.DuplicateEquipme
 import com.materio.materio_backend.business.exception.equipment.EquipmentNotFoundException;
 import com.materio.materio_backend.business.exception.locality.DuplicateLocalityException;
 import com.materio.materio_backend.business.exception.locality.LocalityNotFoundException;
-import com.materio.materio_backend.business.exception.room.RoomNotEmptyException;
-import com.materio.materio_backend.business.exception.room.RoomNotFoundException;
+import com.materio.materio_backend.business.exception.space.SpaceNotEmptyException;
+import com.materio.materio_backend.business.exception.space.SpaceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -15,8 +15,8 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler(RoomNotFoundException.class)
-    ProblemDetail handleRoomNotFoundException(RoomNotFoundException e) {
+    @ExceptionHandler(SpaceNotFoundException.class)
+    ProblemDetail handleRoomNotFoundException(SpaceNotFoundException e) {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
                 HttpStatus.NOT_FOUND,
                 e.getMessage()
@@ -75,8 +75,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return problemDetail;
     }
 
-    @ExceptionHandler(RoomNotEmptyException.class)
-    ProblemDetail handleRoomNotEmptyException(RoomNotEmptyException e) {
+    @ExceptionHandler(SpaceNotEmptyException.class)
+    ProblemDetail handleRoomNotEmptyException(SpaceNotEmptyException e) {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
                 HttpStatus.CONFLICT,
                 e.getMessage()
@@ -87,6 +87,16 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(InvalidQuantityException.class)
     ProblemDetail handleInvalidQuantityException(InvalidQuantityException e) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.CONFLICT,
+                e.getMessage()
+        );
+        problemDetail.setTitle("Salle non vide");
+        return problemDetail;
+    }
+
+    @ExceptionHandler(SpaceHasEquipedZonesException.class)
+    ProblemDetail handleSpaceHasEquipedZonesException(SpaceHasEquipedZonesException e) {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
                 HttpStatus.CONFLICT,
                 e.getMessage()
