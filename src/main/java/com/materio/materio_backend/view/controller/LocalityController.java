@@ -24,11 +24,10 @@ public class LocalityController {
     private LocalityMapper localityMapper;
 
     @PostMapping(value = "/locality", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<LocalityVO> createLocality(@Valid @RequestBody final LocalityBO localityBO) {
+    public ResponseEntity<String> createLocality(@Valid @RequestBody final LocalityBO localityBO) {
 
         final Locality createdLocality = localityService.createLocality(localityBO);
-
-        return ResponseEntity.ok(localityMapper.EntityToVO(createdLocality));
+        return ResponseEntity.ok("OK");
 
     }
 
@@ -38,16 +37,14 @@ public class LocalityController {
             @Valid @RequestBody LocalityBO localityBO) {
 
         final Locality updatedLocality = localityService.updateLocality(name, localityBO);
-
         return ResponseEntity.ok(localityMapper.EntityToVO(updatedLocality));
-
     }
 
     @DeleteMapping("/locality/{name}")
     public ResponseEntity<String> deleteLocality(@PathVariable String name) {
 
         localityService.deleteLocality(name);
-        return ResponseEntity.ok("Le lieu :" + name + "a été supprimé aveec succès");
+        return ResponseEntity.ok("Le lieu :" + name + " a été supprimé aveec succès");
     }
 
     @GetMapping("/locality/{name}")
