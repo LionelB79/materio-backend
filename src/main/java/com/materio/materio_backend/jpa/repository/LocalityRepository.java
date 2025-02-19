@@ -9,9 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface RoomRepository extends JpaRepository<Room,Long> {
-    Optional<Room> findByName(String name);
-    Optional<Room> findByNameAndLocality_Name(String name, String localityName);
+public interface LocalityRepository extends JpaRepository<Locality, Long> {
+    Optional<Locality> findByName(String name);
 
-    List<Room> findByLocality_Name(String localityName);
 }

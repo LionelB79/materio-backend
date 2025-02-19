@@ -12,10 +12,10 @@ import java.time.LocalDateTime;
 @Data
 public abstract class BaseEntity {
     @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    protected LocalDateTime createdAt;
 
     @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+    protected LocalDateTime updatedAt;
 
     @PrePersist
     protected void onCreate() {
