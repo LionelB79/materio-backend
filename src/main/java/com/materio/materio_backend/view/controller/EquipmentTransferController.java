@@ -21,7 +21,5 @@ public class EquipmentTransferController {
 
         final List<EquipmentTransfer> equipmentTransfers = equipmentTransferService.processTransfer(locality, transferRequestDTO);
             return ResponseEntity.ok("Transfert effectué : " + equipmentTransfers);
-
-
     }
 }

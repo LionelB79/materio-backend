@@ -42,10 +42,12 @@ public class EquipmentTransferServiceImpl implements EquipmentTransferService {
     @Override
     public List<EquipmentTransfer> processTransfer(String sourceLocality, TransferRequestDTO request) {
         // Vérification des localities
-        localityService.getLocalityByName(sourceLocality); // Vérifie que la locality source existe
+        // On vérifie que la locality source existe
+        localityService.getLocalityByName(sourceLocality);
+        // On vérifie que la locality cible existe
         Locality targetLocality = localityService.getLocalityByName(request.getTargetLocality());
 
-        // Vérification de la salle cible
+        // On vérifie que la salle cible existe
         Room targetRoom = roomService.getRoom(request.getTargetLocality(), request.getTargetRoomName());
 
         // Traitement des transferts
