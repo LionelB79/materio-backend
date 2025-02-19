@@ -1,11 +1,9 @@
 package com.materio.materio_backend.view.controller;
 
-import com.materio.materio_backend.dto.Locality.LocalityBO;
-import com.materio.materio_backend.dto.Room.RoomBO;
 import com.materio.materio_backend.dto.Room.RoomMapper;
 import com.materio.materio_backend.dto.Room.RoomVO;
 import com.materio.materio_backend.jpa.entity.Room;
-import com.materio.materio_backend.business.service.RoomService;
+import com.materio.materio_backend.business.service.SpaceService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 
@@ -24,7 +22,7 @@ public class RoomController {
     private static final Logger logger = LoggerFactory.getLogger(RoomController.class);
 
     @Autowired
-    private RoomService roomService;
+    private SpaceService roomService;
 
     @Autowired
     private RoomMapper roomMapper;

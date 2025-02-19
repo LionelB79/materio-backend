@@ -1,19 +1,16 @@
 package com.materio.materio_backend.business.service.impl;
 
 import com.materio.materio_backend.business.exception.EquipmentLocationMismatchException;
-import com.materio.materio_backend.business.exception.equipment.EquipmentNotFoundException;
-import com.materio.materio_backend.business.exception.room.RoomNotFoundException;
 import com.materio.materio_backend.business.service.EquipmentService;
 import com.materio.materio_backend.business.service.EquipmentTransferService;
 import com.materio.materio_backend.business.service.LocalityService;
-import com.materio.materio_backend.business.service.RoomService;
+import com.materio.materio_backend.business.service.SpaceService;
 import com.materio.materio_backend.jpa.entity.Equipment;
 import com.materio.materio_backend.jpa.entity.EquipmentTransfer;
 import com.materio.materio_backend.jpa.entity.Locality;
 import com.materio.materio_backend.jpa.entity.Room;
 import com.materio.materio_backend.jpa.repository.EquipmentRepository;
 import com.materio.materio_backend.jpa.repository.EquipmentTransferRepository;
-import com.materio.materio_backend.jpa.repository.RoomRepository;
 import com.materio.materio_backend.dto.Transfer.EquipmentTransfertDTO;
 import com.materio.materio_backend.dto.Transfer.TransferRequestDTO;
 import jakarta.transaction.Transactional;
@@ -21,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -29,7 +25,7 @@ import java.util.List;
 public class EquipmentTransferServiceImpl implements EquipmentTransferService {
 
     @Autowired
-    private RoomService roomService;
+    private SpaceService roomService;
     @Autowired
     private EquipmentRepository equipmentRepo;
     @Autowired

@@ -1,13 +1,11 @@
 package com.materio.materio_backend.business.service.impl;
 
-import com.materio.materio_backend.business.exception.locality.LocalityNotFoundException;
 import com.materio.materio_backend.business.exception.room.RoomNotEmptyException;
 import com.materio.materio_backend.business.exception.room.RoomNotFoundException;
 import com.materio.materio_backend.dto.Room.RoomBO;
 import com.materio.materio_backend.jpa.entity.Locality;
 import com.materio.materio_backend.jpa.entity.Room;
-import com.materio.materio_backend.business.service.RoomService;
-import com.materio.materio_backend.jpa.repository.LocalityRepository;
+import com.materio.materio_backend.business.service.SpaceService;
 import com.materio.materio_backend.jpa.repository.RoomRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +15,7 @@ import java.util.List;
 
 @Service
 @Transactional(rollbackOn = Exception.class)
-public class RoomServiceImpl implements RoomService {
+public class SpaceServiceImpl implements SpaceService {
 
     @Autowired
     RoomRepository roomRepo;
