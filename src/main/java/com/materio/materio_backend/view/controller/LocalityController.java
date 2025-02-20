@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api")
@@ -26,7 +27,7 @@ public class LocalityController {
     @PostMapping(value = "/locality", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> createLocality(@Valid @RequestBody final LocalityBO localityBO) {
 
-        final Locality createdLocality = localityService.createLocality(localityBO);
+        final LocalityBO createdLocality = localityService.createLocality(localityBO);
         return ResponseEntity.ok("OK");
 
     }
@@ -36,8 +37,8 @@ public class LocalityController {
             @PathVariable String name,
             @Valid @RequestBody LocalityBO localityBO) {
 
-        final Locality updatedLocality = localityService.updateLocality(name, localityBO);
-        return ResponseEntity.ok(localityMapper.EntityToVO(updatedLocality));
+        final LocalityBO updatedLocality = localityService.updateLocality(name, localityBO);
+        return ResponseEntity.ok(localityMapper.boToVO(updatedLocality));
     }
 
     @DeleteMapping("/locality/{name}")
@@ -49,17 +50,17 @@ public class LocalityController {
 
     @GetMapping("/locality/{name}")
     public ResponseEntity<LocalityVO> getLocality(@PathVariable String name) {
-        final Locality locality = localityService.getLocalityByName(name);
+        final LocalityBO localityBO = localityService.getLocality(name);
 
-        return ResponseEntity.ok(localityMapper.EntityToVO(locality));
+        return ResponseEntity.ok(localityMapper.boToVO(localityBO));
     }
 
     @GetMapping("/localities")
     public ResponseEntity<List<LocalityVO>> getAllLocalities() {
-        final List<Locality> localities = localityService.getAllLocalities();
+        final Set<LocalityBO> localities = localityService.getAllLocalities();
 
         return ResponseEntity.ok(localities.stream()
-                .map((locality) -> localityMapper.EntityToVO(locality)
+                .map((locality) -> localityMapper.boToVO(locality)
                 ).toList());
     }
 }
