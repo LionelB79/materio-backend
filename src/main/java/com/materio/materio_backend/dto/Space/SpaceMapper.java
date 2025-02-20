@@ -1,90 +1,105 @@
 package com.materio.materio_backend.dto.Space;
 
+import com.materio.materio_backend.dto.Zone.ZoneBO;
 import com.materio.materio_backend.dto.Zone.ZoneMapper;
 import com.materio.materio_backend.jpa.entity.Space;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
+@RequiredArgsConstructor
 public class SpaceMapper {
 @Autowired
-    private ZoneMapper zoneMapper;
+    private final ZoneMapper zoneMapper;
 
-    public Space boToEntity(SpaceBO spaceBO) {
-        if (spaceBO == null) return null;
+    public Space boToEntity(SpaceBO bo) {
+        if (bo == null) return null;
 
-        Space space = new Space();
-        space.setId(spaceBO.getId());
-        space.setName(spaceBO.getName());
-
-        if (spaceBO.getZones() != null && !spaceBO.getZones().isEmpty()) {
-            space.setZones(spaceBO.getZones().stream()
-                    .map(zoneMapper::boToEntity)
-                    .collect(Collectors.toSet()));
-        } else {
-            space.setZones(new HashSet<>());
-        }
-
-        return space;
+        Space entity = new Space();
+        updateEntityFromBO(entity, bo);
+        return entity;
     }
 
-    public SpaceBO entityToBO(Space space) {
-        if (space == null) return null;
+    public SpaceBO entityToBO(Space entity) {
+        if (entity == null) return null;
 
-        SpaceBO spaceBO = new SpaceBO();
-        spaceBO.setId(space.getId());
-        spaceBO.setName(space.getName());
-        spaceBO.setLocalityName(space.getLocality() != null ? space.getLocality().getName() : null);
+        SpaceBO bo = new SpaceBO();
+        bo.setId(entity.getId());
+        bo.setName(entity.getName());
 
-        if (space.getZones() != null && !space.getZones().isEmpty()) {
-            spaceBO.setZones(space.getZones().stream()
-                    .map(zone -> zoneMapper.entityToBO(zone))
-                    .collect(Collectors.toSet()));
-        } else {
-            spaceBO.setZones(new HashSet<>());
+        if (entity.getLocality() != null) {
+            bo.setLocalityName(entity.getLocality().getName());
         }
 
-        return spaceBO;
+        if (entity.getZones() != null) {
+            Set<ZoneBO> zones = entity.getZones().stream()
+                    .map(zoneMapper::entityToBO)
+                    .collect(Collectors.toSet());
+            bo.setZones(zones);
+        }
+
+        return bo;
     }
 
-    public SpaceVO boToVO(SpaceBO spaceBO) {
-        if (spaceBO == null) return null;
+    public SpaceVO boToVO(SpaceBO bo) {
+        if (bo == null) return null;
 
-        SpaceVO spaceVO = new SpaceVO();
-        spaceVO.setId(spaceBO.getId());
-        spaceVO.setName(spaceBO.getName());
-        spaceVO.setLocalityName(spaceBO.getLocalityName());
+        SpaceVO vo = new SpaceVO();
+        vo.setId(bo.getId());
+        vo.setName(bo.getName());
+        vo.setLocalityName(bo.getLocalityName());
 
-        if (spaceBO.getZones() != null && !spaceBO.getZones().isEmpty()) {
-            spaceVO.setZones(spaceBO.getZones().stream()
+        // Mapping des zones
+        if (bo.getZones() != null) {
+            vo.setZones(bo.getZones().stream()
                     .map(zoneMapper::boToVO)
                     .collect(Collectors.toSet()));
         } else {
-            spaceVO.setZones(new HashSet<>());
+            vo.setZones(new HashSet<>());
         }
 
-        return spaceVO;
+        return vo;
     }
 
-    public SpaceBO voToBO(SpaceVO spaceVO) {
-        if (spaceVO == null) return null;
+    public SpaceBO voToBO(SpaceVO vo) {
+        if (vo == null) return null;
 
-        SpaceBO spaceBO = new SpaceBO();
-        spaceBO.setId(spaceVO.getId());
-        spaceBO.setName(spaceVO.getName());
-        spaceBO.setLocalityName(spaceVO.getLocalityName());
+        SpaceBO bo = new SpaceBO();
+        bo.setId(vo.getId());
+        bo.setName(vo.getName());
+        bo.setLocalityName(vo.getLocalityName());
 
-        if (spaceVO.getZones() != null && !spaceVO.getZones().isEmpty()) {
-            spaceBO.setZones(spaceVO.getZones().stream()
+        // Mapping des zones
+        if (vo.getZones() != null) {
+            bo.setZones(vo.getZones().stream()
                     .map(zoneMapper::voToBO)
                     .collect(Collectors.toSet()));
         } else {
-            spaceBO.setZones(new HashSet<>());
+            bo.setZones(new HashSet<>());
         }
 
-        return spaceBO;
+        return bo;
+    }
+
+    public Set<SpaceVO> boSetToVOSet(Set<SpaceBO> bos) {
+        if (bos == null) return null;
+        return bos.stream()
+                .map(this::boToVO)
+                .collect(Collectors.toSet());
+    }
+
+    public void updateEntityFromBO(Space entity, SpaceBO bo) {
+        if (entity == null || bo == null) return;
+
+        entity.setId(bo.getId());
+        entity.setName(bo.getName());
+
     }
 }

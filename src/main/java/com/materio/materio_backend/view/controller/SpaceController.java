@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping(value = "/api", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -45,7 +46,7 @@ public class SpaceController {
 
     @GetMapping(value = "/spaces")
     public ResponseEntity<List<SpaceVO>> getAllSapces(@RequestParam String localityName) {
-        List<SpaceBO> spaces = spaceService.getSpacesByLocality(localityName);
+        Set<SpaceBO> spaces = spaceService.getSpacesByLocality(localityName);
 
         return ResponseEntity.ok(spaces.stream()
                 .map(space -> spaceMapper.boToVO(space))
