@@ -47,4 +47,10 @@ public class EquipmentTransfer extends BaseEntity {
 
     @Column(name = "to_locality")
     private String toLocality;
+
+    @Column(name = "from_space")
+    private String fromSpace;
+
+    @Column(name = "to_space")
+    private String toSpace;
 }

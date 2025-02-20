@@ -1,31 +1,32 @@
 package com.materio.materio_backend.business.service.impl;
 
 import com.materio.materio_backend.business.exception.EquipmentLocationMismatchException;
-import com.materio.materio_backend.business.service.EquipmentService;
-import com.materio.materio_backend.business.service.EquipmentTransferService;
-import com.materio.materio_backend.business.service.LocalityService;
-import com.materio.materio_backend.business.service.SpaceService;
+import com.materio.materio_backend.business.exception.locality.LocalityNotFoundException;
+import com.materio.materio_backend.business.service.*;
+import com.materio.materio_backend.dto.Equipment.EquipmentBO;
+import com.materio.materio_backend.dto.Equipment.EquipmentMapper;
+import com.materio.materio_backend.dto.Transfer.*;
+import com.materio.materio_backend.dto.Zone.ZoneBO;
 import com.materio.materio_backend.jpa.entity.Equipment;
 import com.materio.materio_backend.jpa.entity.EquipmentTransfer;
 import com.materio.materio_backend.jpa.entity.Locality;
-import com.materio.materio_backend.jpa.entity.Room;
+import com.materio.materio_backend.jpa.entity.Space;
 import com.materio.materio_backend.jpa.repository.EquipmentRepository;
 import com.materio.materio_backend.jpa.repository.EquipmentTransferRepository;
-import com.materio.materio_backend.dto.Transfer.EquipmentTransfertDTO;
-import com.materio.materio_backend.dto.Transfer.TransferRequestDTO;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(rollbackOn = Exception.class)
 public class EquipmentTransferServiceImpl implements EquipmentTransferService {
 
     @Autowired
-    private SpaceService roomService;
+    private SpaceService spaceService;
     @Autowired
     private EquipmentRepository equipmentRepo;
     @Autowired
@@ -34,78 +35,106 @@ public class EquipmentTransferServiceImpl implements EquipmentTransferService {
     private EquipmentTransferRepository equipmentTransferRepo;
     @Autowired
     private LocalityService localityService;
+    @Autowired private EquipmentMapper equipmentMapper;
+    @Autowired private ZoneService zoneService;
+    @Autowired private EquipmentTransferMapper transferMapper;
 
     @Override
-    public List<EquipmentTransfer> processTransfer(String sourceLocality, TransferRequestDTO request) {
-        // Vérification des localities
-        // On vérifie que la locality source existe
-        localityService.getLocalityByName(sourceLocality);
-        // On vérifie que la locality cible existe
-        Locality targetLocality = localityService.getLocalityByName(request.getTargetLocality());
+    public EquipmentTransferBO processTransfer(EquipmentTransferBO transferBO) {
 
-        // On vérifie que la salle cible existe
-        Room targetRoom = roomService.getRoom(request.getTargetLocality(), request.getTargetRoomName());
 
-        // Traitement des transferts
-        LocalDateTime now = LocalDateTime.now();
-        return request.getEquipments().stream()
-                .map(equipment -> transferSingleEquipment(
-                        equipment,
-                        sourceLocality,
-                        targetRoom,
-                        now,
-                        request.getDetails()))
-                .toList();
+        // Validation des zones source et cible
+        validateZones(transferBO);
+
+        // Récupération et validation de l'équipement
+        EquipmentBO equipment = equipmentService.getEquipment(
+                transferBO.getSerialNumber(),
+                transferBO.getReferenceName());
+
+        validateCurrentLocation(equipment, transferBO);
+
+        // Création et sauvegarde du transfert
+        EquipmentTransfer transfer = createTransferEntity(equipment, transferBO);
+        EquipmentTransfer savedTransfer = equipmentTransferRepo.save(transfer);
+
+        // Mise à jour de la localisation de l'équipement
+        updateEquipmentLocation(equipment, transferBO);
+
+        return transferMapper.entityToBO(savedTransfer);
     }
 
-    private EquipmentTransfer transferSingleEquipment(
-            EquipmentTransfertDTO equipmentVO,
-            String sourceLocality,
-            Room targetRoom,
-            LocalDateTime now,
-            String transferDetails) {
+    @Override
+    public List<EquipmentTransferBO> getTransferHistory(String referenceName, String serialNumber) {
 
-        // Récupération de l'équipement
-        Equipment equipment = equipmentService.getEquipment(
-                equipmentVO.getSerialNumber(),
-                equipmentVO.getReferenceName());
 
-        // Vérification de la salle source
-        Room sourceRoom = roomService.getRoom(sourceLocality, equipmentVO.getRoomName());
-
-        // Vérification de la localisation actuelle
-        validateEquipmentLocation(equipment, sourceRoom, equipmentVO);
-
-        // Création du transfert
-        EquipmentTransfer equipmentTransfer = new EquipmentTransfer();
-        equipmentTransfer.setEquipment(equipment);
-        equipmentTransfer.setTransferDate(now);
-        equipmentTransfer.setFromRoom(sourceRoom.getName());
-        equipmentTransfer.setToRoom(targetRoom.getName());
-        equipmentTransfer.setFromLocality(sourceRoom.getLocality().getName());
-        equipmentTransfer.setToLocality(targetRoom.getLocality().getName());
-        equipmentTransfer.setDetails(transferDetails);
-
-        // Sauvegarde du transfert
-        equipmentTransfer = equipmentTransferRepo.save(equipmentTransfer);
-
-        // Mise à jour de l'équipement
-        equipment.setRoom(targetRoom);
-        equipment.setUpdatedAt(now);
-        equipmentRepo.save(equipment);
-
-        return equipmentTransfer;
+        return equipmentTransferRepo
+                .findByEquipmentIdReferenceNameAndEquipmentIdSerialNumber(referenceName, serialNumber)
+                .stream()
+                .map(transferMapper::entityToBO)
+                .collect(Collectors.toList());
     }
 
-    private void validateEquipmentLocation(final Equipment equipment,final Room sourceRoom,final EquipmentTransfertDTO equipmentVO) {
-        if (!equipment.getRoom().getId().equals(sourceRoom.getId())) {
+    private void validateZones(EquipmentTransferBO transferBO) {
+        // Vérification de la zone source
+        zoneService.getZone(
+                transferBO.getSourceLocalityName(),
+                transferBO.getSourceSpaceName(),
+                transferBO.getSourceZoneName());
+
+        // Vérification de la zone cible
+        zoneService.getZone(
+                transferBO.getTargetLocalityName(),
+                transferBO.getTargetSpaceName(),
+                transferBO.getTargetZoneName());
+    }
+
+    private void validateCurrentLocation(EquipmentBO equipment, EquipmentTransferBO transferBO) {
+        boolean locationMismatch = !equipment.getZoneName().equals(transferBO.getSourceZoneName()) ||
+                !equipment.getSpaceName().equals(transferBO.getSourceSpaceName()) ||
+                !equipment.getLocalityName().equals(transferBO.getSourceLocalityName());
+
+        if (locationMismatch) {
             throw new EquipmentLocationMismatchException(
-                    equipmentVO.getReferenceName(),
-                    equipmentVO.getRoomName(),
-                    sourceRoom.getLocality().getName(),
-                    equipment.getRoom().getName(),
-                    equipment.getRoom().getLocality().getName()
-            );
+                    transferBO.getReferenceName(),
+                    equipment.getZoneName(),
+                    equipment.getSpaceName(),
+                    equipment.getLocalityName(),
+                    transferBO.getSourceZoneName(),
+                    transferBO.getSourceSpaceName(),
+                    transferBO.getSourceLocalityName());
         }
+    }
+
+    private EquipmentTransfer createTransferEntity(EquipmentBO equipment, EquipmentTransferBO transferBO) {
+        EquipmentTransfer transfer = new EquipmentTransfer();
+        transfer.setEquipment(equipmentMapper.boToEntity(equipment));
+        transfer.setTransferDate(LocalDateTime.now());
+
+        // Source
+        transfer.setFromZone(transferBO.getSourceZoneName());
+        transfer.setFromSpace(transferBO.getSourceSpaceName());
+        transfer.setFromLocality(transferBO.getSourceLocalityName());
+
+        // Destination
+        transfer.setToZone(transferBO.getTargetZoneName());
+        transfer.setToSpace(transferBO.getTargetSpaceName());
+        transfer.setToLocality(transferBO.getTargetLocalityName());
+
+        transfer.setDetails(transferBO.getDetails());
+
+        return transfer;
+    }
+
+    private void updateEquipmentLocation(EquipmentBO equipment, EquipmentTransferBO transferBO) {
+        ZoneBO targetZone = zoneService.getZone(
+                transferBO.getTargetLocalityName(),
+                transferBO.getTargetSpaceName(),
+                transferBO.getTargetZoneName());
+
+        equipment.setZoneName(targetZone.getName());
+        equipment.setSpaceName(targetZone.getSpaceName());
+        equipment.setLocalityName(targetZone.getLocalityName());
+
+        equipmentService.updateEquipment(equipment);
     }
 }
