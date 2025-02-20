@@ -21,8 +21,8 @@ public class EquipmentController {
     @PostMapping(value = "/equipment")
     public ResponseEntity<String> createEquipment(@Valid @RequestBody EquipmentBO equipmentBO) {
 
-        final Equipment newEquipment = equipmentService.createEquipment(equipmentBO);
-        final EquipmentVO response = equipmentMapper.EntityToVO(newEquipment);
+        final EquipmentBO request = equipmentService.createEquipment(equipmentBO);
+        final EquipmentVO response = equipmentMapper.boToVO(request);
         return ResponseEntity.ok("equipmentBO créé :" + response);
 
     }

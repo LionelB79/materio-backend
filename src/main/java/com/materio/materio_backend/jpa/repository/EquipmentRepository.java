@@ -7,12 +7,16 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+
 @Repository
 public interface EquipmentRepository extends JpaRepository<Equipment, EquipmentPK> {
-    @Query("SELECT e FROM Equipment e WHERE e.id.serialNumber = :serialNumber AND e.id.referenceName = :referenceName")
-    Optional<Equipment> findBySerialNumberAndReferenceName(
-            @Param("serialNumber") String serialNumber,
-            @Param("referenceName") String referenceName
-    );
+    Optional<Equipment> findByIdSerialNumberAndIdReferenceName(String serialNumber, String referenceName);
+
+    Set<Equipment> findByZoneNameAndZoneSpaceNameAndZoneSpaceLocalityName(
+            String zoneName,
+            String spaceName,
+            String localityName);
 }
