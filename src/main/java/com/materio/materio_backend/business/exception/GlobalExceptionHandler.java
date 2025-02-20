@@ -4,8 +4,12 @@ import com.materio.materio_backend.business.exception.equipment.DuplicateEquipme
 import com.materio.materio_backend.business.exception.equipment.EquipmentNotFoundException;
 import com.materio.materio_backend.business.exception.locality.DuplicateLocalityException;
 import com.materio.materio_backend.business.exception.locality.LocalityNotFoundException;
+import com.materio.materio_backend.business.exception.space.DuplicateSpaceException;
+import com.materio.materio_backend.business.exception.space.SpaceHasEquipedZonesException;
 import com.materio.materio_backend.business.exception.space.SpaceNotEmptyException;
 import com.materio.materio_backend.business.exception.space.SpaceNotFoundException;
+import com.materio.materio_backend.business.exception.zone.ZoneNotEmptyException;
+import com.materio.materio_backend.business.exception.zone.ZoneNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -16,7 +20,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(SpaceNotFoundException.class)
-    ProblemDetail handleRoomNotFoundException(SpaceNotFoundException e) {
+    ProblemDetail handleSpaceNotFoundException(SpaceNotFoundException e) {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
                 HttpStatus.NOT_FOUND,
                 e.getMessage()
@@ -104,5 +108,36 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         problemDetail.setTitle("Salle non vide");
         return problemDetail;
     }
+
+    @ExceptionHandler(ZoneNotFoundException.class)
+    ProblemDetail handleZoneNotFoundException(ZoneNotFoundException e) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.NOT_FOUND,
+                e.getMessage()
+        );
+        problemDetail.setTitle("Localité introuvable");
+        return problemDetail;
+    }
+
+    @ExceptionHandler(DuplicateSpaceException.class)
+    ProblemDetail handleDuplicateSpaceException(DuplicateSpaceException e) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.CONFLICT,
+                e.getMessage()
+        );
+        problemDetail.setTitle("Salle non vide");
+        return problemDetail;
+    }
+
+    @ExceptionHandler(ZoneNotEmptyException.class)
+    ProblemDetail handleZoneNotEmptyException(ZoneNotEmptyException e) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.CONFLICT,
+                e.getMessage()
+        );
+        problemDetail.setTitle("Salle non vide");
+        return problemDetail;
+    }
+
 
 }
