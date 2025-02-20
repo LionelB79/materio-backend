@@ -32,6 +32,10 @@ public class ZoneVO {
     @Size(min = 2, max = 50, message = "Le nom de la localité doit contenir entre 2 et 50 caractères")
     private String localityName;
 
+    @NotBlank(message = "Le nom de la zone est obligatoire")
+    @Size(min = 2, max = 50, message = "Le nom de la zone doit contenir entre 2 et 50 caractères")
+    private String zoneName;
+
     @Valid
     private Set<EquipmentBO> equipments = new HashSet<>();
 }
