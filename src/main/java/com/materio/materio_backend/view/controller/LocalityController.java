@@ -25,10 +25,11 @@ public class LocalityController {
     private LocalityMapper localityMapper;
 
     @PostMapping(value = "/locality", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> createLocality(@Valid @RequestBody final LocalityBO localityBO) {
+    public ResponseEntity<LocalityVO> createLocality(@Valid @RequestBody final LocalityBO localityBO) {
 
         final LocalityBO createdLocality = localityService.createLocality(localityBO);
-        return ResponseEntity.ok("OK");
+        LocalityVO localityVO = localityMapper.boToVO(createdLocality);
+        return ResponseEntity.ok(localityVO);
 
     }
 

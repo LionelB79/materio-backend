@@ -16,92 +16,78 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
-    @RequiredArgsConstructor
-    public class ZoneMapper {
+public class ZoneMapper {
+
     @Autowired
-        private EquipmentMapper equipmentMapper;
+    private  EquipmentMapper equipmentMapper;
 
-        /**
-         * Convertit un BO en entité Zone
-         * Cette méthode est utilisée lors de la création/mise à jour d'une zone
-         * Note: La relation avec Space est gérée par le service
-         */
-        public Zone boToEntity(ZoneBO bo) {
-            if (bo == null) return null;
 
-            Zone entity = new Zone();
+    public Zone boToEntity(ZoneBO zoneBO) {
+        if (zoneBO == null) return null;
 
-            // Attributs simples
-            entity.setName(bo.getName());
-            entity.setDescription(bo.getDescription());
+        Zone entity = new Zone();
+        entity.setName(zoneBO.getName());
+        entity.setDescription(zoneBO.getDescription());
 
-            // Conversion des équipements si présents
-            if (bo.getEquipments() != null && !bo.getEquipments().isEmpty()) {
-                Set<Equipment> equipments = bo.getEquipments().stream()
-                        .map(equipmentMapper::boToEntity)
-                        .collect(Collectors.toSet());
-                entity.setEquipments(equipments);
-            } else {
-                entity.setEquipments(new HashSet<>());
-            }
-
-            // Note: Space sera défini par le service car il nécessite une recherche en base
-
-            return entity;
+        if (zoneBO.getEquipments() != null && !zoneBO.getEquipments().isEmpty()) {
+            Set<Equipment> equipments = zoneBO.getEquipments().stream()
+                    .map(equipmentMapper::boToEntity)
+                    .collect(Collectors.toSet());
+            entity.setEquipments(equipments);
+        } else {
+            entity.setEquipments(new HashSet<>());
         }
+
+        return entity;
+    }
 
         /**
          * Convertit une entité Zone en BO
          * Cette méthode enrichit le BO avec les informations de navigation
          * (spaceName, localityName, etc.)
          */
-        public ZoneBO entityToBO(Zone entity) {
-            if (entity == null) return null;
+        public ZoneBO entityToBO(Zone zone) {
+            if (zone == null) return null;
 
-            ZoneBO bo = new ZoneBO();
+            ZoneBO zoneBO = new ZoneBO();
 
-            // Attributs simples
-            bo.setName(entity.getName());
-            bo.setDescription(entity.getDescription());
+            zoneBO.setName(zone.getName());
+            zoneBO.setDescription(zone.getDescription());
 
-            // Navigation information
-            if (entity.getSpace() != null) {
-                bo.setSpaceName(entity.getSpace().getName());
-                if (entity.getSpace().getLocality() != null) {
-                    bo.setLocalityName(entity.getSpace().getLocality().getName());
+            if (zone.getSpace() != null) {
+                zoneBO.setSpaceName(zone.getSpace().getName());
+                if (zone.getSpace().getLocality() != null) {
+                    zoneBO.setLocalityName(zone.getSpace().getLocality().getName());
                 }
             }
 
-            // Conversion des équipements associés
-            if (entity.getEquipments() != null) {
-                Set<EquipmentBO> equipments = entity.getEquipments().stream()
+            if (zone.getEquipments() != null) {
+                Set<EquipmentBO> equipments = zone.getEquipments().stream()
                         .map(equipmentMapper::entityToBO)
                         .collect(Collectors.toSet());
-                bo.setEquipments(equipments);
+                zoneBO.setEquipments(equipments);
             }
 
-            return bo;
+            return zoneBO;
         }
 
         /**
          * Convertit un BO en VO pour l'affichage
          * Le VO contient des informations supplémentaires pour la présentation
          */
-        public ZoneVO boToVO(ZoneBO bo) {
-            if (bo == null) return null;
+        public ZoneVO boToVO(ZoneBO zoneBO) {
+            if (zoneBO == null) return null;
 
             ZoneVO vo = new ZoneVO();
 
-            // Copie des attributs communs
-            vo.setName(bo.getName());
-            vo.setDescription(bo.getDescription());
-            vo.setSpaceName(bo.getSpaceName());
-            vo.setLocalityName(bo.getLocalityName());
-            vo.setZoneName(bo.getName()); // Le zoneName dans le VO est le même que le name
+            vo.setName(zoneBO.getName());
+            vo.setDescription(zoneBO.getDescription());
+            vo.setSpaceName(zoneBO.getSpaceName());
+            vo.setLocalityName(zoneBO.getLocalityName());
+            vo.setZoneName(zoneBO.getName()); // Le zoneName dans le VO est le même que le name
 
-            // Conversion des équipements si présents
-            if (bo.getEquipments() != null) {
-                vo.setEquipments(new HashSet<>(bo.getEquipments())); // Les EquipmentBO sont les mêmes
+            if (zoneBO.getEquipments() != null) {
+                vo.setEquipments(new HashSet<>(zoneBO.getEquipments())); // Les EquipmentBO sont les mêmes
             }
 
             return vo;
@@ -111,20 +97,18 @@ import java.util.stream.Collectors;
          * Convertit un VO en BO
          * Utilisé principalement pour les opérations depuis l'interface utilisateur
          */
-        public ZoneBO voToBO(ZoneVO vo) {
-            if (vo == null) return null;
+        public ZoneBO voToBO(ZoneVO zoneVO) {
+            if (zoneVO == null) return null;
 
             ZoneBO bo = new ZoneBO();
 
-            // Copie des attributs de base
-            bo.setName(vo.getName());
-            bo.setDescription(vo.getDescription());
-            bo.setSpaceName(vo.getSpaceName());
-            bo.setLocalityName(vo.getLocalityName());
+            bo.setName(zoneVO.getName());
+            bo.setDescription(zoneVO.getDescription());
+            bo.setSpaceName(zoneVO.getSpaceName());
+            bo.setLocalityName(zoneVO.getLocalityName());
 
-            // Copie des équipements si présents
-            if (vo.getEquipments() != null) {
-                bo.setEquipments(new HashSet<>(vo.getEquipments()));
+            if (zoneVO.getEquipments() != null) {
+                bo.setEquipments(new HashSet<>(zoneVO.getEquipments()));
             }
 
             return bo;
@@ -134,13 +118,12 @@ import java.util.stream.Collectors;
          * Met à jour une entité existante avec les données d'un BO
          * Utilisé pour les mises à jour partielles
          */
-        public void updateEntityFromBO(Zone entity, ZoneBO bo) {
-            if (entity == null || bo == null) return;
+        public void updateEntityFromBO(Zone zone, ZoneBO zoneBO) {
+            if (zone == null || zoneBO == null) return;
 
             // Mise à jour uniquement des champs modifiables
-            entity.setName(bo.getName());
-            entity.setDescription(bo.getDescription());
+            zone.setName(zoneBO.getName());
+            zone.setDescription(zoneBO.getDescription());
 
-            // Note: Les relations (Space, Equipment) sont gérées par le service
         }
     }

@@ -1,42 +1,27 @@
 package com.materio.materio_backend.dto.Equipment;
 
-import com.materio.materio_backend.dto.Zone.ZoneMapper;
 import com.materio.materio_backend.jpa.entity.Equipment;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class EquipmentMapper {
-@Autowired
-    private ZoneMapper zoneMapper;
 
     public Equipment boToEntity(EquipmentBO bo) {
         if (bo == null) return null;
 
         Equipment entity = new Equipment();
-
         entity.setSerialNumber(bo.getSerialNumber());
         entity.setReferenceName(bo.getReferenceName());
-
         entity.setPurchaseDate(bo.getPurchaseDate());
         entity.setMark(bo.getMark());
         entity.setDescription(bo.getDescription());
-
         return entity;
     }
 
-    /**
-     * Convertit une entité en BO
-     * Cette méthode enrichit le BO avec les informations de navigation (spaceName, zoneName, etc.)
-     */
     public EquipmentBO entityToBO(Equipment entity) {
         if (entity == null) return null;
 
         EquipmentBO bo = new EquipmentBO();
-
         bo.setSerialNumber(entity.getSerialNumber());
         bo.setReferenceName(entity.getReferenceName());
         bo.setPurchaseDate(entity.getPurchaseDate());

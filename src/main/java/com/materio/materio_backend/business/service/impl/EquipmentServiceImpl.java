@@ -9,6 +9,7 @@ import com.materio.materio_backend.dto.Zone.ZoneBO;
 import com.materio.materio_backend.dto.Zone.ZoneMapper;
 import com.materio.materio_backend.jpa.entity.Equipment;
 
+import com.materio.materio_backend.jpa.entity.Zone;
 import com.materio.materio_backend.jpa.repository.EquipmentRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,38 +40,22 @@ public class EquipmentServiceImpl implements EquipmentService {
 
     @Override
     public EquipmentBO createEquipment(final EquipmentBO equipmentBO) {
-
-
-        // Vérification de l'unicité du numéro de série pour cette référence
-        equipmentRepo.findByIdSerialNumberAndIdReferenceName(
-                        equipmentBO.getSerialNumber(),
-                        equipmentBO.getReferenceName())
-                .ifPresent(e -> {
-                    throw new DuplicateEquipmentException(
-                            equipmentBO.getReferenceName(),
-                            equipmentBO.getSerialNumber());
-                });
-
         // Récupération de la zone initiale pour l'équipement
         ZoneBO zoneBO = zoneService.getZone(
                 equipmentBO.getLocalityName(),
                 equipmentBO.getSpaceName(),
                 equipmentBO.getZoneName());
 
-        // Création et configuration de l'équipement
-        Equipment equipment = new Equipment();
-        equipment.setSerialNumber(equipmentBO.getSerialNumber());
-        equipment.setReferenceName(equipmentBO.getReferenceName());
-        equipment.setPurchaseDate(equipmentBO.getPurchaseDate());
-        equipment.setDescription(equipmentBO.getDescription());
-        equipment.setMark(equipmentBO.getMark());
-        equipment.setZone(zoneMapper.boToEntity(zoneBO));
+        // Création de l'équipement
+        Equipment equipment = equipmentMapper.boToEntity(equipmentBO);
 
-        // Mise à jour du compteur de référence
-        equipmentRefService.getOrCreateReference(equipmentBO.getReferenceName());
+        // Association de la zone
+        Zone zone = zoneMapper.boToEntity(zoneBO);
+        equipment.setZone(zone);
 
-
-        return equipmentMapper.entityToBO(equipmentRepo.save(equipment));
+        // Sauvegarde
+        Equipment savedEquipment = equipmentRepo.save(equipment);
+        return equipmentMapper.entityToBO(savedEquipment);
     }
 
     @Override
