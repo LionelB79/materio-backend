@@ -45,7 +45,7 @@ import java.util.stream.Collectors;
 
        @Override
        public Set<EquipmentTransferBO> processTransfer(EquipmentTransferBO transferBO) {
-           // Vérification de la zone cible
+           // On vérifie si la zone cible existe
            validateTargetZone(transferBO);
 
            // Vérification que tous les équipements sont de la même localité source
@@ -53,9 +53,9 @@ import java.util.stream.Collectors;
 
            Set<EquipmentTransferBO> results = new HashSet<>();
 
-           // Traitement de chaque équipement
+
            for (EquipmentToTransfer equipmentToTransfer : transferBO.getEquipments()) {
-               // Récupération et validation de l'équipement
+
                EquipmentBO equipment = equipmentService.getEquipment(
                        equipmentToTransfer.getSerialNumber(),
                        equipmentToTransfer.getReferenceName());

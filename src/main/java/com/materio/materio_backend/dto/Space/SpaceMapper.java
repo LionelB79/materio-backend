@@ -56,7 +56,7 @@ public class SpaceMapper {
         vo.setName(bo.getName());
         vo.setLocalityName(bo.getLocalityName());
 
-        // Mapping des zones
+
         if (bo.getZones() != null) {
             vo.setZones(bo.getZones().stream()
                     .map(zoneMapper::boToVO)
@@ -76,7 +76,7 @@ public class SpaceMapper {
         bo.setName(vo.getName());
         bo.setLocalityName(vo.getLocalityName());
 
-        // Mapping des zones
+
         if (vo.getZones() != null) {
             bo.setZones(vo.getZones().stream()
                     .map(zoneMapper::voToBO)

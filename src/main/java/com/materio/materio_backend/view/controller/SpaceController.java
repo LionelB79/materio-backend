@@ -33,7 +33,7 @@ public class SpaceController {
     public ResponseEntity<String> createSpace(@Valid @RequestBody SpaceVO spaceVO) {
 
         spaceService.createSpace(spaceMapper.voToBO(spaceVO));
-        return ResponseEntity.ok("l'espace" + spaceVO.getName() + " a été créé");
+        return ResponseEntity.ok("l'espace " + spaceVO.getName() + " a été créé");
     }
 
 

@@ -15,7 +15,8 @@ import java.util.Set;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "t_space")
+@Table(name = "t_space",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"name", "locality_id"}))
 public class Space extends BaseEntity {
 
     @Id
@@ -24,7 +25,7 @@ public class Space extends BaseEntity {
 
     @NotBlank(message = "Le nom de l'espace est obligatoire")
     @Size(min = 2, max = 25, message = "Le nom doit contenir entre 2 et 100 caractères")
-    @Column(name = "name", nullable = false, unique = true)
+    @Column(name = "name", nullable = false)
     private String name;
 
     @JsonManagedReference("space-zones")

@@ -56,7 +56,7 @@ public class EquipmentTransferMapper {
         sourceEquipment.setSourceZoneName(entity.getFromZone());
         sourceEquipment.setSourceSpaceName(entity.getFromSpace());
 
-        // Création du BO
+
         EquipmentTransferBO bo = new EquipmentTransferBO();
         bo.setEquipments(Set.of(sourceEquipment));
         bo.setTargetZoneName(entity.getToZone());

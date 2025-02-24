@@ -2,6 +2,7 @@ package com.materio.materio_backend.business.service.impl;
 
 import com.materio.materio_backend.business.exception.locality.LocalityNotFoundException;
 import com.materio.materio_backend.business.exception.space.SpaceNotFoundException;
+import com.materio.materio_backend.business.exception.zone.DuplicateZoneException;
 import com.materio.materio_backend.business.exception.zone.ZoneNotEmptyException;
 import com.materio.materio_backend.business.exception.zone.ZoneNotFoundException;
 import com.materio.materio_backend.business.service.LocalityService;
@@ -14,6 +15,7 @@ import com.materio.materio_backend.dto.Zone.ZoneMapper;
 import com.materio.materio_backend.jpa.entity.Locality;
 import com.materio.materio_backend.jpa.entity.Space;
 import com.materio.materio_backend.jpa.entity.Zone;
+import com.materio.materio_backend.jpa.repository.SpaceRepository;
 import com.materio.materio_backend.jpa.repository.ZoneRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,21 +43,33 @@ public class ZoneServiceImpl implements ZoneService {
     @Autowired
     private SpaceMapper spaceMapper;
 
+    @Autowired private SpaceRepository spaceRepository;
+
     @Override
     public ZoneBO createZone(ZoneBO zoneBO) {
+        // Vérifie l'existence de l'espace parent et récupère l'entité Space
+        Space space = spaceRepository.findByNameAndLocality_Name(
+                        zoneBO.getSpaceName(),
+                        zoneBO.getLocalityName())
+                .orElseThrow(() -> new SpaceNotFoundException(zoneBO.getSpaceName()));
 
-        // Vérifie l'existence de l'espace parent
-        SpaceBO spaceBO = spaceService.getSpace(zoneBO.getLocalityName(), zoneBO.getSpaceName());
+        // Vérification de l'unicité de la zone dans cet espace
+        zoneRepository.findByNameAndSpaceNameAndSpaceLocalityName(
+                        zoneBO.getName(),
+                        zoneBO.getSpaceName(),
+                        zoneBO.getLocalityName())
+                .ifPresent(z -> {
+                    throw new DuplicateZoneException(zoneBO.getName());
+                });
 
         // Conversion en entité pour la persistance
         Zone entity = zoneMapper.boToEntity(zoneBO);
 
-        // La relation avec Space est gérée ici car elle nécessite une recherche en base
-        entity.setSpace(spaceMapper.boToEntity(spaceBO));
+        // Association avec l'espace existant
+        entity.setSpace(space);
 
         // Sauvegarde et reconversion en BO pour le retour
         Zone savedEntity = zoneRepository.save(entity);
-
         return zoneMapper.entityToBO(savedEntity);
     }
 

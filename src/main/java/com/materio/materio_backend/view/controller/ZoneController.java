@@ -7,6 +7,7 @@ import com.materio.materio_backend.dto.Zone.ZoneVO;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,7 +15,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/zones")
+@RequestMapping(value = "/api", consumes = MediaType.APPLICATION_JSON_VALUE)
 @Validated
 public class ZoneController {
 
@@ -28,7 +29,7 @@ public class ZoneController {
         this.zoneMapper = zoneMapper;
     }
 
-    @PostMapping
+    @PostMapping(value = "/zone")
     @ResponseStatus(HttpStatus.CREATED)
     public ZoneVO createZone(@Valid @RequestBody ZoneVO zoneVO) {
         ZoneBO zoneBO = zoneMapper.voToBO(zoneVO);
@@ -36,7 +37,7 @@ public class ZoneController {
         return zoneMapper.boToVO(createdZone);
     }
 
-    @PutMapping("/{localityName}/{spaceName}/{zoneName}")
+    @PutMapping(value = "/zone/{localityName}/{spaceName}/{zoneName}")
     public ZoneVO updateZone(
             @PathVariable String localityName,
             @PathVariable String spaceName,
@@ -55,7 +56,7 @@ public class ZoneController {
         return zoneMapper.boToVO(updatedZone);
     }
 
-    @DeleteMapping("/{localityName}/{spaceName}/{zoneName}")
+    @DeleteMapping(value = "/zone/{localityName}/{spaceName}/{zoneName}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteZone(
             @PathVariable String localityName,
@@ -64,7 +65,7 @@ public class ZoneController {
         zoneService.deleteZone(localityName, spaceName, zoneName);
     }
 
-    @GetMapping("/{localityName}/{spaceName}/{zoneName}")
+    @GetMapping(value = "/zone/{localityName}/{spaceName}/{zoneName}")
     public ZoneVO getZone(
             @PathVariable String localityName,
             @PathVariable String spaceName,
@@ -73,7 +74,7 @@ public class ZoneController {
         return zoneMapper.boToVO(zoneBO);
     }
 
-    @GetMapping("/{localityName}/{spaceName}")
+    @GetMapping(value = "/zones/{localityName}/{spaceName}")
     public Set<ZoneVO> getZones(
             @PathVariable String localityName,
             @PathVariable String spaceName) {

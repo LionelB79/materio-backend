@@ -28,6 +28,7 @@ public class LocalityServiceImpl implements LocalityService {
     @Autowired
     private LocalityMapper localityMapper;
 
+
     @Override
     public LocalityBO createLocality(final LocalityBO localityBO) {
 

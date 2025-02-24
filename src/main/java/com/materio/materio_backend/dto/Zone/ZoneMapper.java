@@ -41,11 +41,7 @@ public class ZoneMapper {
         return entity;
     }
 
-        /**
-         * Convertit une entité Zone en BO
-         * Cette méthode enrichit le BO avec les informations de navigation
-         * (spaceName, localityName, etc.)
-         */
+
         public ZoneBO entityToBO(Zone zone) {
             if (zone == null) return null;
 
@@ -71,10 +67,6 @@ public class ZoneMapper {
             return zoneBO;
         }
 
-        /**
-         * Convertit un BO en VO pour l'affichage
-         * Le VO contient des informations supplémentaires pour la présentation
-         */
         public ZoneVO boToVO(ZoneBO zoneBO) {
             if (zoneBO == null) return null;
 
@@ -84,7 +76,6 @@ public class ZoneMapper {
             vo.setDescription(zoneBO.getDescription());
             vo.setSpaceName(zoneBO.getSpaceName());
             vo.setLocalityName(zoneBO.getLocalityName());
-            vo.setZoneName(zoneBO.getName()); // Le zoneName dans le VO est le même que le name
 
             if (zoneBO.getEquipments() != null) {
                 vo.setEquipments(new HashSet<>(zoneBO.getEquipments())); // Les EquipmentBO sont les mêmes
@@ -92,11 +83,7 @@ public class ZoneMapper {
 
             return vo;
         }
-
-        /**
-         * Convertit un VO en BO
-         * Utilisé principalement pour les opérations depuis l'interface utilisateur
-         */
+        
         public ZoneBO voToBO(ZoneVO zoneVO) {
             if (zoneVO == null) return null;
 
@@ -114,10 +101,7 @@ public class ZoneMapper {
             return bo;
         }
 
-        /**
-         * Met à jour une entité existante avec les données d'un BO
-         * Utilisé pour les mises à jour partielles
-         */
+
         public void updateEntityFromBO(Zone zone, ZoneBO zoneBO) {
             if (zone == null || zoneBO == null) return;
 
