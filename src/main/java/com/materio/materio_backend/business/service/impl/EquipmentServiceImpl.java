@@ -43,7 +43,7 @@ public class EquipmentServiceImpl implements EquipmentService {
 
     @Override
     public EquipmentBO createEquipment(final EquipmentBO equipmentBO) {
-        // Vérification de l'unicité du numéro de série pour cette référence
+        // On vérifie l'unicité du numéro de série pour cette référence
         equipmentRepo.findByIdSerialNumberAndIdReferenceName(
                         equipmentBO.getSerialNumber(),
                         equipmentBO.getReferenceName())
@@ -53,7 +53,7 @@ public class EquipmentServiceImpl implements EquipmentService {
                             equipmentBO.getSerialNumber());
                 });
 
-        // Récupération de la zone depuis la base de données
+        // On récupère récupére la zone depuis la base de données
         Zone zone = zoneRepository.findByNameAndSpaceNameAndSpaceLocalityName(
                         equipmentBO.getZoneName(),
                         equipmentBO.getSpaceName(),
@@ -84,7 +84,7 @@ public class EquipmentServiceImpl implements EquipmentService {
     @Override
     public EquipmentBO updateEquipment(final EquipmentBO equipmentBO) {
 
-        // Récupération de l'équipement existant
+        // On récupère l'équipement existant
         Equipment equipment = equipmentRepo.findByIdSerialNumberAndIdReferenceName(equipmentBO.getSerialNumber(), equipmentBO.getReferenceName())
                 .orElseThrow(() -> new EquipmentNotFoundException(equipmentBO.getReferenceName()));
 
@@ -115,7 +115,7 @@ public class EquipmentServiceImpl implements EquipmentService {
             String spaceName,
             String zoneName) {
 
-        // Vérification de l'existence de la zone
+        // On vérifie si la zone existe
         zoneService.getZone(localityName, spaceName, zoneName);
 
        Set<Equipment> equipments =  equipmentRepo.findByZoneNameAndZoneSpaceNameAndZoneSpaceLocalityName(
