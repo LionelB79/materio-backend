@@ -14,4 +14,6 @@ public class EquipmentVO {
     private String spaceName;
     private String zoneName;
     private String localityName;
+    private String tag;
+    private Integer barCode;
 }

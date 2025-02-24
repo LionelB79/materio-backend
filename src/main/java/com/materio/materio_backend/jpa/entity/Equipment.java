@@ -41,6 +41,13 @@ public class Equipment extends BaseEntity {
  @JoinColumn(name = "zone_id", nullable = false)
  private Zone zone;
 
+ @Column(name = "tag")
+ @Size(max = 100, message = "Le tag ne peut pas dépasser 100 caractères")
+ private String tag;
+
+ @Column(name = "barcode")
+ private Integer barcode;
+
  @Transient
  public String getSerialNumber() {
   return id.getSerialNumber();

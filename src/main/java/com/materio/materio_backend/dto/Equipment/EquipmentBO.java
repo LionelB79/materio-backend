@@ -39,4 +39,8 @@ public class EquipmentBO {
     @NotBlank(message = "Le nom de la localité est obligatoire")
     private String localityName;
 
+    private String tag;
+
+    private Integer barCode;
+
 }

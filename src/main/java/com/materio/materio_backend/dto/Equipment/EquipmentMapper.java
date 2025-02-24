@@ -5,7 +5,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class EquipmentMapper {
-
     public Equipment boToEntity(EquipmentBO bo) {
         if (bo == null) return null;
 
@@ -15,6 +14,8 @@ public class EquipmentMapper {
         entity.setPurchaseDate(bo.getPurchaseDate());
         entity.setMark(bo.getMark());
         entity.setDescription(bo.getDescription());
+        entity.setTag(bo.getTag());          // Nouveau
+        entity.setBarcode(bo.getBarCode()); // Nouveau
         return entity;
     }
 
@@ -27,6 +28,8 @@ public class EquipmentMapper {
         bo.setPurchaseDate(entity.getPurchaseDate());
         bo.setMark(entity.getMark());
         bo.setDescription(entity.getDescription());
+        bo.setTag(entity.getTag());          // Nouveau
+        bo.setBarCode(entity.getBarcode()); // Nouveau
 
         if (entity.getZone() != null) {
             bo.setZoneName(entity.getZone().getName());
@@ -41,12 +44,10 @@ public class EquipmentMapper {
         return bo;
     }
 
-
     public EquipmentVO boToVO(EquipmentBO bo) {
         if (bo == null) return null;
 
         EquipmentVO vo = new EquipmentVO();
-
         vo.setSerialNumber(bo.getSerialNumber());
         vo.setReferenceName(bo.getReferenceName());
         vo.setPurchaseDate(bo.getPurchaseDate());
@@ -55,17 +56,16 @@ public class EquipmentMapper {
         vo.setZoneName(bo.getZoneName());
         vo.setSpaceName(bo.getSpaceName());
         vo.setLocalityName(bo.getLocalityName());
-
+        vo.setTag(bo.getTag());          // Nouveau
+        vo.setBarCode(bo.getBarCode()); // Nouveau
 
         return vo;
     }
-
 
     public EquipmentBO voToBO(EquipmentVO vo) {
         if (vo == null) return null;
 
         EquipmentBO bo = new EquipmentBO();
-
         bo.setSerialNumber(vo.getSerialNumber());
         bo.setReferenceName(vo.getReferenceName());
         bo.setPurchaseDate(vo.getPurchaseDate());
@@ -74,10 +74,11 @@ public class EquipmentMapper {
         bo.setZoneName(vo.getZoneName());
         bo.setSpaceName(vo.getSpaceName());
         bo.setLocalityName(vo.getLocalityName());
+        bo.setTag(vo.getTag());          // Nouveau
+        bo.setBarCode(vo.getBarCode()); // Nouveau
 
         return bo;
     }
-
 
     public void updateEntityFromBO(Equipment entity, EquipmentBO bo) {
         if (entity == null || bo == null) return;
@@ -85,6 +86,7 @@ public class EquipmentMapper {
         entity.setPurchaseDate(bo.getPurchaseDate());
         entity.setMark(bo.getMark());
         entity.setDescription(bo.getDescription());
-
+        entity.setTag(bo.getTag());          // Nouveau
+        entity.setBarcode(bo.getBarCode()); // Nouveau
     }
 }
