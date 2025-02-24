@@ -13,6 +13,5 @@ public class EquipmentVO {
     private String description;
     private String spaceName;
     private String zoneName;
-    private LocalDate createdAt;
-    private LocalDate updatedAt;
+    private String localityName;
 }

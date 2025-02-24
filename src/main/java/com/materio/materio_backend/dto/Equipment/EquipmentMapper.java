@@ -54,6 +54,7 @@ public class EquipmentMapper {
         vo.setDescription(bo.getDescription());
         vo.setZoneName(bo.getZoneName());
         vo.setSpaceName(bo.getSpaceName());
+        vo.setLocalityName(bo.getLocalityName());
 
 
         return vo;
@@ -72,6 +73,7 @@ public class EquipmentMapper {
         bo.setDescription(vo.getDescription());
         bo.setZoneName(vo.getZoneName());
         bo.setSpaceName(vo.getSpaceName());
+        bo.setLocalityName(vo.getLocalityName());
 
         return bo;
     }

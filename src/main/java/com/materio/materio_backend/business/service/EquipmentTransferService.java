@@ -3,6 +3,7 @@ package com.materio.materio_backend.business.service;
 import com.materio.materio_backend.dto.Transfer.EquipmentTransferBO;
 
 import java.util.List;
+import java.util.Set;
 
 public interface EquipmentTransferService {
     /**
@@ -10,7 +11,7 @@ public interface EquipmentTransferService {
      * @param transferBO Les informations du transfert à effectuer
      * @return Le transfert effectué
      */
-    EquipmentTransferBO processTransfer(EquipmentTransferBO transferBO);
+    Set<EquipmentTransferBO> processTransfer(EquipmentTransferBO transferBO);
 
     /**
      * Récupère l'historique des transferts d'un équipement
@@ -18,5 +19,5 @@ public interface EquipmentTransferService {
      * @param serialNumber Le numéro de série de l'équipement
      * @return La liste des transferts de l'équipement
      */
-    List<EquipmentTransferBO> getTransferHistory(String referenceName, String serialNumber);
+    Set<EquipmentTransferBO> getTransferHistory(String referenceName, String serialNumber);
 }

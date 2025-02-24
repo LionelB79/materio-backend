@@ -1,7 +1,7 @@
 package com.materio.materio_backend.business.service.impl;
 
-import com.materio.materio_backend.business.exception.InvalidQuantityException;
-import com.materio.materio_backend.business.exception.ReferenceNotFoundException;
+import com.materio.materio_backend.business.exception.reference.InvalidQuantityException;
+import com.materio.materio_backend.business.exception.reference.ReferenceNotFoundException;
 import com.materio.materio_backend.business.service.EquipmentRefService;
 import com.materio.materio_backend.jpa.entity.EquipmentRef;
 import com.materio.materio_backend.jpa.repository.EquipmentRefRepository;

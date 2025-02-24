@@ -2,6 +2,7 @@ package com.materio.materio_backend.business.service.impl;
 
 import com.materio.materio_backend.business.exception.equipment.DuplicateEquipmentException;
 import com.materio.materio_backend.business.exception.equipment.EquipmentNotFoundException;
+import com.materio.materio_backend.business.exception.zone.ZoneNotFoundException;
 import com.materio.materio_backend.business.service.*;
 import com.materio.materio_backend.dto.Equipment.EquipmentBO;
 import com.materio.materio_backend.dto.Equipment.EquipmentMapper;
@@ -11,6 +12,7 @@ import com.materio.materio_backend.jpa.entity.Equipment;
 
 import com.materio.materio_backend.jpa.entity.Zone;
 import com.materio.materio_backend.jpa.repository.EquipmentRepository;
+import com.materio.materio_backend.jpa.repository.ZoneRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -36,27 +38,40 @@ public class EquipmentServiceImpl implements EquipmentService {
     @Autowired
     private ZoneMapper zoneMapper;
     @Autowired private EquipmentMapper equipmentMapper;
+    @Autowired private ZoneRepository zoneRepository;
 
 
     @Override
     public EquipmentBO createEquipment(final EquipmentBO equipmentBO) {
-        // Récupération de la zone initiale pour l'équipement
-        ZoneBO zoneBO = zoneService.getZone(
-                equipmentBO.getLocalityName(),
-                equipmentBO.getSpaceName(),
-                equipmentBO.getZoneName());
+        // Vérification de l'unicité du numéro de série pour cette référence
+        equipmentRepo.findByIdSerialNumberAndIdReferenceName(
+                        equipmentBO.getSerialNumber(),
+                        equipmentBO.getReferenceName())
+                .ifPresent(e -> {
+                    throw new DuplicateEquipmentException(
+                            equipmentBO.getReferenceName(),
+                            equipmentBO.getSerialNumber());
+                });
+
+        // Récupération de la zone depuis la base de données
+        Zone zone = zoneRepository.findByNameAndSpaceNameAndSpaceLocalityName(
+                        equipmentBO.getZoneName(),
+                        equipmentBO.getSpaceName(),
+                        equipmentBO.getLocalityName())
+                .orElseThrow(() -> new ZoneNotFoundException(equipmentBO.getZoneName()));
 
         // Création de l'équipement
         Equipment equipment = equipmentMapper.boToEntity(equipmentBO);
-
-        // Association de la zone
-        Zone zone = zoneMapper.boToEntity(zoneBO);
         equipment.setZone(zone);
+
+        // Mise à jour du compteur de référence
+        equipmentRefService.getOrCreateReference(equipmentBO.getReferenceName());
 
         // Sauvegarde
         Equipment savedEquipment = equipmentRepo.save(equipment);
         return equipmentMapper.entityToBO(savedEquipment);
     }
+
 
     @Override
     public EquipmentBO getEquipment(final String serialNumber, final String referenceName) {
