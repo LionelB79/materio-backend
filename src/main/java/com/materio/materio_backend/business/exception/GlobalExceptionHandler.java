@@ -4,10 +4,12 @@ import com.materio.materio_backend.business.exception.equipment.DuplicateEquipme
 import com.materio.materio_backend.business.exception.equipment.EquipmentNotFoundException;
 import com.materio.materio_backend.business.exception.locality.DuplicateLocalityException;
 import com.materio.materio_backend.business.exception.locality.LocalityNotFoundException;
+import com.materio.materio_backend.business.exception.reference.InvalidQuantityException;
 import com.materio.materio_backend.business.exception.space.DuplicateSpaceException;
 import com.materio.materio_backend.business.exception.space.SpaceHasEquipedZonesException;
 import com.materio.materio_backend.business.exception.space.SpaceNotEmptyException;
 import com.materio.materio_backend.business.exception.space.SpaceNotFoundException;
+import com.materio.materio_backend.business.exception.zone.DuplicateZoneException;
 import com.materio.materio_backend.business.exception.zone.ZoneNotEmptyException;
 import com.materio.materio_backend.business.exception.zone.ZoneNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -85,7 +87,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 HttpStatus.CONFLICT,
                 e.getMessage()
         );
-        problemDetail.setTitle("Salle non vide");
+        problemDetail.setTitle("Espace non vide");
         return problemDetail;
     }
 
@@ -95,7 +97,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 HttpStatus.CONFLICT,
                 e.getMessage()
         );
-        problemDetail.setTitle("Salle non vide");
+        problemDetail.setTitle("Quantité invalide");
         return problemDetail;
     }
 
@@ -105,7 +107,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 HttpStatus.CONFLICT,
                 e.getMessage()
         );
-        problemDetail.setTitle("Salle non vide");
+        problemDetail.setTitle("Espace non vide");
         return problemDetail;
     }
 
@@ -115,7 +117,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 HttpStatus.NOT_FOUND,
                 e.getMessage()
         );
-        problemDetail.setTitle("Localité introuvable");
+        problemDetail.setTitle("Zone introuvable");
         return problemDetail;
     }
 
@@ -125,7 +127,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 HttpStatus.CONFLICT,
                 e.getMessage()
         );
-        problemDetail.setTitle("Salle non vide");
+        problemDetail.setTitle("Espace déjà existant");
         return problemDetail;
     }
 
@@ -135,9 +137,19 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 HttpStatus.CONFLICT,
                 e.getMessage()
         );
-        problemDetail.setTitle("Salle non vide");
+        problemDetail.setTitle("Zone non vide");
         return problemDetail;
     }
 
+
+    @ExceptionHandler(DuplicateZoneException.class)
+    ProblemDetail handleDuplicateZoneException(DuplicateZoneException e) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.CONFLICT,
+                e.getMessage()
+        );
+        problemDetail.setTitle("Zone déjà existante");
+        return problemDetail;
+    }
 
 }
