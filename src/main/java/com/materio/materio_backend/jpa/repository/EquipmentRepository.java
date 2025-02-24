@@ -19,4 +19,9 @@ public interface EquipmentRepository extends JpaRepository<Equipment, EquipmentP
             String zoneName,
             String spaceName,
             String localityName);
+    Set<Equipment> findByZoneSpaceNameAndZoneSpaceLocalityName(
+            String spaceName, String localityName);
+
+    Set<Equipment> findByZoneSpaceLocalityName(String localityName);
+
 }

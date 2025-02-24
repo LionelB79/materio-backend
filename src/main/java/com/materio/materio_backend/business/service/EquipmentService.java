@@ -12,5 +12,7 @@ public interface EquipmentService {
     EquipmentBO getEquipment(String serialNumber, String referenceName);
     EquipmentBO updateEquipment(EquipmentBO equipmentBO);
     Set<EquipmentBO> getEquipmentsByZone(String localityName, String spaceName, String zoneName);
-
+    Set<EquipmentBO> getEquipmentsBySpace(String localityName, String spaceName);
+    Set<EquipmentBO> getEquipmentsByLocality(String localityName);
+    Set<EquipmentBO> getAllEquipments();
 }

@@ -125,5 +125,36 @@ public class EquipmentServiceImpl implements EquipmentService {
 
         return equipments.stream().map(equipment -> equipmentMapper.entityToBO(equipment)).collect(Collectors.toSet());
     }
-}
 
+    @Override
+    public Set<EquipmentBO> getEquipmentsBySpace(String localityName, String spaceName) {
+        // On vérifie si l'espace existe
+        spaceService.getSpace(localityName, spaceName);
+
+        Set<Equipment> equipments = equipmentRepo.findByZoneSpaceNameAndZoneSpaceLocalityName(
+                spaceName, localityName);
+
+        return equipments.stream()
+                .map(equipmentMapper::entityToBO)
+                .collect(Collectors.toSet());
+    }
+
+    @Override
+    public Set<EquipmentBO> getEquipmentsByLocality(String localityName) {
+        // On vérifie si la localité existe
+        localityService.getLocality(localityName);
+
+        Set<Equipment> equipments = equipmentRepo.findByZoneSpaceLocalityName(localityName);
+
+        return equipments.stream()
+                .map(equipmentMapper::entityToBO)
+                .collect(Collectors.toSet());
+    }
+
+    @Override
+    public Set<EquipmentBO> getAllEquipments() {
+        return equipmentRepo.findAll().stream()
+                .map(equipmentMapper::entityToBO)
+                .collect(Collectors.toSet());
+    }
+}
