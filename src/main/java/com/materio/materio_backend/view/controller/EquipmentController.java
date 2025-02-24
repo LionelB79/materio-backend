@@ -35,4 +35,20 @@ public class EquipmentController {
         equipmentService.deleteEquipment(serialNumber, referenceName);
         return ResponseEntity.ok("equipment supprimé avec succès :" + referenceName);
     }
+    @PutMapping("/equipment/{referenceName}/{serialNumber}")
+    public ResponseEntity<EquipmentVO> updateEquipment(
+            @PathVariable String referenceName,
+            @PathVariable String serialNumber,
+            @Valid @RequestBody EquipmentVO equipmentVO) {
+
+        if (!referenceName.equals(equipmentVO.getReferenceName())
+                || !serialNumber.equals(equipmentVO.getSerialNumber())) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        EquipmentBO equipmentBO = equipmentMapper.voToBO(equipmentVO);
+        EquipmentBO updatedEquipment = equipmentService.updateEquipment(equipmentBO);
+
+        return ResponseEntity.ok(equipmentMapper.boToVO(updatedEquipment));
+    }
 }

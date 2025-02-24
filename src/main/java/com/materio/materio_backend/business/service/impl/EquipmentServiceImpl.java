@@ -92,7 +92,7 @@ public class EquipmentServiceImpl implements EquipmentService {
         equipment.setPurchaseDate(equipmentBO.getPurchaseDate());
         equipment.setDescription(equipmentBO.getDescription());
         equipment.setMark(equipmentBO.getMark());
-        equipment.setTag(equipmentBO.getTag());          // Nouveau
+        equipment.setTag(equipmentBO.getTag());
         equipment.setBarcode(equipmentBO.getBarCode());
         equipmentRepo.save(equipment);
 

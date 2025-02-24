@@ -14,8 +14,8 @@ public class EquipmentMapper {
         entity.setPurchaseDate(bo.getPurchaseDate());
         entity.setMark(bo.getMark());
         entity.setDescription(bo.getDescription());
-        entity.setTag(bo.getTag());          // Nouveau
-        entity.setBarcode(bo.getBarCode()); // Nouveau
+        entity.setTag(bo.getTag());
+        entity.setBarcode(bo.getBarCode());
         return entity;
     }
 
@@ -28,8 +28,8 @@ public class EquipmentMapper {
         bo.setPurchaseDate(entity.getPurchaseDate());
         bo.setMark(entity.getMark());
         bo.setDescription(entity.getDescription());
-        bo.setTag(entity.getTag());          // Nouveau
-        bo.setBarCode(entity.getBarcode()); // Nouveau
+        bo.setTag(entity.getTag());
+        bo.setBarCode(entity.getBarcode());
 
         if (entity.getZone() != null) {
             bo.setZoneName(entity.getZone().getName());
@@ -56,8 +56,8 @@ public class EquipmentMapper {
         vo.setZoneName(bo.getZoneName());
         vo.setSpaceName(bo.getSpaceName());
         vo.setLocalityName(bo.getLocalityName());
-        vo.setTag(bo.getTag());          // Nouveau
-        vo.setBarCode(bo.getBarCode()); // Nouveau
+        vo.setTag(bo.getTag());
+        vo.setBarCode(bo.getBarCode());
 
         return vo;
     }
@@ -74,8 +74,8 @@ public class EquipmentMapper {
         bo.setZoneName(vo.getZoneName());
         bo.setSpaceName(vo.getSpaceName());
         bo.setLocalityName(vo.getLocalityName());
-        bo.setTag(vo.getTag());          // Nouveau
-        bo.setBarCode(vo.getBarCode()); // Nouveau
+        bo.setTag(vo.getTag());
+        bo.setBarCode(vo.getBarCode());
 
         return bo;
     }
@@ -86,7 +86,7 @@ public class EquipmentMapper {
         entity.setPurchaseDate(bo.getPurchaseDate());
         entity.setMark(bo.getMark());
         entity.setDescription(bo.getDescription());
-        entity.setTag(bo.getTag());          // Nouveau
-        entity.setBarcode(bo.getBarCode()); // Nouveau
+        entity.setTag(bo.getTag());
+        entity.setBarcode(bo.getBarCode());
     }
 }
