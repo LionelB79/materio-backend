@@ -161,6 +161,32 @@ http://localhost:8080/api/equipment
     "localityName": "CDS Agile Macif"
 }
 
+Transfer
+http://localhost:8080/api/transfers
+{
+    "targetZoneName": "zone 2",
+    "targetSpaceName": "Stockage",
+    "targetLocalityName": "CDS Agile Macif" ,
+    "details": "transfert d'equipment vers CDS agile",
+    "equipments": [
+    {
+        "referenceName":"Photocopieuse",
+        "serialNumber": "585858",
+        "sourceZoneName": "zone 1",
+        "sourceSpaceName": "Etage"
+    },
+    {
+        "referenceName":"Ecran",
+        "serialNumber": "58698",
+        "sourceZoneName": "zone 2",
+        "sourceSpaceName": "Stockage"
+    }
+    ]
+}
+
+
+
+
 GET
 Equipments
 http://localhost:8080/api/equipments
