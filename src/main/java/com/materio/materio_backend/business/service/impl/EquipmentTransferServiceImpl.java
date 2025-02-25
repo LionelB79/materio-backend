@@ -1,17 +1,12 @@
 package com.materio.materio_backend.business.service.impl;
 
-import com.materio.materio_backend.business.exception.EquipmentLocationMismatchException;
-import com.materio.materio_backend.business.exception.TransferValidationException;
-import com.materio.materio_backend.business.exception.locality.LocalityNotFoundException;
+import com.materio.materio_backend.business.exception.equipment.EquipmentLocationMismatchException;
+import com.materio.materio_backend.business.exception.transfer.TransferValidationException;
 import com.materio.materio_backend.business.service.*;
 import com.materio.materio_backend.dto.Equipment.EquipmentBO;
 import com.materio.materio_backend.dto.Equipment.EquipmentMapper;
 import com.materio.materio_backend.dto.Transfer.*;
-import com.materio.materio_backend.dto.Zone.ZoneBO;
-import com.materio.materio_backend.jpa.entity.Equipment;
 import com.materio.materio_backend.jpa.entity.EquipmentTransfer;
-import com.materio.materio_backend.jpa.entity.Locality;
-import com.materio.materio_backend.jpa.entity.Space;
 import com.materio.materio_backend.jpa.repository.EquipmentRepository;
 import com.materio.materio_backend.jpa.repository.EquipmentTransferRepository;
 import jakarta.transaction.Transactional;
@@ -20,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 

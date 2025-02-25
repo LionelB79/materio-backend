@@ -1,6 +1,7 @@
 package com.materio.materio_backend.business.exception;
 
 import com.materio.materio_backend.business.exception.equipment.DuplicateEquipmentException;
+import com.materio.materio_backend.business.exception.equipment.EquipmentLocationMismatchException;
 import com.materio.materio_backend.business.exception.equipment.EquipmentNotFoundException;
 import com.materio.materio_backend.business.exception.locality.DuplicateLocalityException;
 import com.materio.materio_backend.business.exception.locality.LocalityNotFoundException;

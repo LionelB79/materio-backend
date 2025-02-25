@@ -1,4 +1,4 @@
-package com.materio.materio_backend.business.exception;
+package com.materio.materio_backend.business.exception.equipment;
 
 public class EquipmentLocationMismatchException extends RuntimeException {
     public EquipmentLocationMismatchException(
