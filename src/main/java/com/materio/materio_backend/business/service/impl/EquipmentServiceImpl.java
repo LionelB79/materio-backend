@@ -88,12 +88,16 @@ public class EquipmentServiceImpl implements EquipmentService {
         Equipment equipment = equipmentRepo.findByIdSerialNumberAndIdReferenceName(equipmentBO.getSerialNumber(), equipmentBO.getReferenceName())
                 .orElseThrow(() -> new EquipmentNotFoundException(equipmentBO.getReferenceName()));
 
+        Zone zone = zoneRepository.findByNameAndSpaceNameAndSpaceLocalityName(equipmentBO.getZoneName(), equipmentBO.getSpaceName(), equipmentBO.getLocalityName())
+                .orElseThrow(() -> new ZoneNotFoundException(equipmentBO.getZoneName()));
+
         // Mise à jour uniquement des informations de base de l'équipement
         equipment.setPurchaseDate(equipmentBO.getPurchaseDate());
         equipment.setDescription(equipmentBO.getDescription());
         equipment.setMark(equipmentBO.getMark());
         equipment.setTag(equipmentBO.getTag());
         equipment.setBarcode(equipmentBO.getBarCode());
+        equipment.setZone(zone);
         equipmentRepo.save(equipment);
 
         return equipmentMapper.entityToBO(equipment);
