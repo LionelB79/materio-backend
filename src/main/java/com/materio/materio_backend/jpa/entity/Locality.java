@@ -38,6 +38,6 @@ public class Locality extends BaseEntity {
     @Column(name = "city")
     private String city;
 
-    @OneToMany(mappedBy = "locality", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<Room> rooms = new HashSet<>();
+    @OneToMany(mappedBy = "locality", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Space> spaces = new HashSet<>();
 }

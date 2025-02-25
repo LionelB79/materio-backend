@@ -1,4 +1,4 @@
-package com.materio.materio_backend.business.exception;
+package com.materio.materio_backend.business.exception.reference;
 
 public class ReferenceNotFoundException extends RuntimeException {
     public ReferenceNotFoundException(String referenceName) {

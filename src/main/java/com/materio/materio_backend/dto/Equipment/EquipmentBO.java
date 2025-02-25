@@ -1,5 +1,6 @@
 package com.materio.materio_backend.dto.Equipment;
 
+import com.materio.materio_backend.jpa.entity.Zone;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -29,6 +30,17 @@ public class EquipmentBO {
     @Size(max = 500, message = "La description ne peut pas dépasser 500 caractères")
     private String description;
 
-    @NotBlank(message = "Le nom de la salle est obligatoire")
-    private String roomName;
+    @NotBlank(message = "Le nom de la zone est obligatoire")
+    private String zoneName;
+
+    @NotBlank(message = "Le nom de l'espace est obligatoire")
+    private String spaceName;
+
+    @NotBlank(message = "Le nom de la localité est obligatoire")
+    private String localityName;
+
+    private String tag;
+
+    private Integer barCode;
+
 }

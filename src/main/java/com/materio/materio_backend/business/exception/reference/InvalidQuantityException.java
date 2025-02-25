@@ -1,4 +1,4 @@
-package com.materio.materio_backend.business.exception;
+package com.materio.materio_backend.business.exception.reference;
 
 public class InvalidQuantityException extends RuntimeException {
     public InvalidQuantityException(String referenceName) {

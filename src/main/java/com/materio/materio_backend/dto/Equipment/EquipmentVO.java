@@ -11,7 +11,9 @@ public class EquipmentVO {
     private LocalDate purchaseDate;
     private String mark;
     private String description;
-    private String roomName;
-    private LocalDate createdAt;
-    private LocalDate updatedAt;
+    private String spaceName;
+    private String zoneName;
+    private String localityName;
+    private String tag;
+    private Integer barCode;
 }

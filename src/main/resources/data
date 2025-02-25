@@ -1,59 +1,197 @@
+POST
 Locality :
+http://localhost:8080/api/locality
 {
     "name": "Agence CGI Bessines",
     "address": "3 Rue Thomas Portau",
     "cp": "79000",
     "city": "Niort"
 }
+{
+    "name": "CDS Agile Macif",
+    "address": "8 Rue Thomas Portau",
+    "cp": "79000",
+    "city": "Niort"
+}
 
-Rooms
+
+
+Space
+http://localhost:8080/api/space
 {
     "name": "Stockage",
-    "localityName": "Agence CGI Bessines"
-}
-{
-    "name": "Salle 1",
-    "localityName": "Agence CGI Bessines"
-}
-{
-    "name": "Salle 2",
-    "localityName": "Agence CGI Bessines"
+    "localityName": "Agence CGI Bessines",
+    "equipments": []
 
+}
+{
+    "name": "Etage",
+    "localityName": "Agence CGI Bessines",
+    "equipments": []
+
+}
+{
+    "name": "Stockage",
+    "localityName": "CDS Agile Macif",
+    "equipments": []
+
+}
+
+
+
+Zone
+http://localhost:8080/api/zone
+{
+    "name": "zone 1",
+    "description":"zone 1 du Stockage de l'Agence CGI Bessines" ,
+    "spaceName" : "Stockage",
+    "localityName": "Agence CGI Bessines",
+    "equipments": []
+
+}
+{
+    "name": "zone 2",
+    "description":"zone 2 du Stockage de l'Agence CGI Bessines" ,
+    "spaceName" : "Stockage",
+    "localityName": "Agence CGI Bessines",
+    "equipments": []
+
+}
+{
+    "name": "zone 1",
+    "description":"zone 1 du Etage de l'Agence CGI Bessines" ,
+    "spaceName" : "Etage",
+    "localityName": "Agence CGI Bessines",
+    "equipments": []
+
+}
+{
+    "name": "zone 2",
+    "description":"zone 2 du Etage de l'Agence CGI Bessines" ,
+    "spaceName" : "Etage",
+    "localityName": "Agence CGI Bessines",
+    "equipments": []
+
+}
+{
+    "name": "zone 1",
+    "description":"zone 1 du Stockage du CDS Agile Macif" ,
+    "spaceName" : "Stockage",
+    "localityName": "CDS Agile Macif",
+    "equipments": []
+}
+{
+    "name": "zone 2",
+    "description":"zone 2 du Stockage du CDS Agile Macif" ,
+    "spaceName" : "Stockage",
+    "localityName": "CDS Agile Macif",
+    "equipments": []
 }
 
 Equiments
-{
-    "referenceName": "PC",
-    "mark": "DELL",
-    "description": "",
-    "serialNumber": "12345",
-    "purchaseDate": "2018-02-05T12:59:11",
-    "roomName":"Stockage"
-},
+http://localhost:8080/api/equipment
 {
     "referenceName": "Clavier",
-    "mark": "Roccat",
-    "description": "Clavier lumineux",
     "serialNumber": "12345",
     "purchaseDate": "2018-03-05T12:59:11",
-    "roomName":"Stockage"
+    "mark": "Roccat",
+    "description": "Clavier lumineux",
+    "zoneName": "zone 1",
+    "spaceName":"Stockage",
+    "localityName": "Agence CGI Bessines"
+}
+{
+    "referenceName": "Ecran",
+    "serialNumber": "12345",
+    "purchaseDate": "2018-03-05T12:59:11",
+    "mark": "Dell",
+    "description": "PC récupéré de Bordeaux",
+    "zoneName": "zone 1",
+    "spaceName":"Stockage",
+    "localityName": "Agence CGI Bessines"
+}
+{
+    "referenceName": "Ecran",
+    "serialNumber": "58698",
+    "purchaseDate": "2018-03-05T12:59:11",
+    "mark": "Dell",
+    "description": "PC récupéré de Bordeaux",
+    "zoneName": "zone 2",
+    "spaceName":"Stockage",
+    "localityName": "Agence CGI Bessines"
+}
+{
+    "referenceName": "Photocopieuse",
+    "serialNumber": "585858",
+    "purchaseDate": "2018-03-05T12:59:11",
+    "mark": "Samsung",
+    "description": "",
+    "zoneName": "zone 1",
+    "spaceName":"Etage",
+    "localityName": "Agence CGI Bessines"
+}
+{
+    "referenceName": "Telephone fixe",
+    "serialNumber": "2525",
+    "purchaseDate": "2018-03-05T12:59:11",
+    "mark": "Samsung",
+    "description": "",
+    "zoneName": "zone 2",
+    "spaceName":"Etage",
+    "localityName": "Agence CGI Bessines"
+}
+{
+    "referenceName": "Ecran",
+    "serialNumber": "25263",
+    "purchaseDate": "2018-03-05T12:59:11",
+    "mark": "AOC",
+    "description": "",
+    "zoneName": "zone 1",
+    "spaceName":"Stockage",
+    "localityName": "CDS Agile Macif"
+}
+{
+    "referenceName": "Casque",
+    "serialNumber": "25263",
+    "purchaseDate": "2018-03-05T12:59:11",
+    "mark": "Logitech",
+    "description": "",
+    "zoneName": "zone 2",
+    "spaceName":"Stockage",
+    "localityName": "CDS Agile Macif"
 }
 
 Transfer
+http://localhost:8080/api/transfers
 {
-    "targetRoomName": "Salle 1",
-    "equipements" : [
-        {
-            "referenceName":"PC",
-            "serialNumber":12345,
-            "roomName" : "Stockage"
-        },
-        {
-            "id": 2,
-                "referenceName":"Clavier",
-                "serialNumber":12345,
-            "roomName" : "Stockage"
-        }
-        ],
-    "details": "PI de fin de journée"
+    "targetZoneName": "zone 2",
+    "targetSpaceName": "Stockage",
+    "targetLocalityName": "CDS Agile Macif" ,
+    "details": "transfert d'equipment vers CDS agile",
+    "equipments": [
+    {
+        "referenceName":"Photocopieuse",
+        "serialNumber": "585858",
+        "sourceZoneName": "zone 1",
+        "sourceSpaceName": "Etage"
+    },
+    {
+        "referenceName":"Ecran",
+        "serialNumber": "58698",
+        "sourceZoneName": "zone 2",
+        "sourceSpaceName": "Stockage"
+    }
+    ]
 }
+
+
+
+
+GET
+Equipments
+http://localhost:8080/api/equipments
+http://localhost:8080/api/equipments/locality/Agence CGI Bessines
+http://localhost:8080/api/equipments/locality/CDS Agile Macif
+http://localhost:8080/api/equipments/space?localityName=Agence%20CGI%20Bessines&spaceName=Stockage
+http://localhost:8080/api/equipments/space?localityName=Agence%20CGI%20Bessines&spaceName=Etage
+http://localhost:8080/api/equipments/zone?localityName=Agence%20CGI%20Bessines&spaceName=Stockage&zoneName=zone%201

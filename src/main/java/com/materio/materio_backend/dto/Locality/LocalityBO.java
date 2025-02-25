@@ -1,9 +1,15 @@
 package com.materio.materio_backend.dto.Locality;
 
+import com.materio.materio_backend.dto.Space.SpaceBO;
+import com.materio.materio_backend.dto.Space.SpaceVO;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -25,4 +31,6 @@ public class LocalityBO {
     @NotBlank(message = "La ville est obligatoire")
     @Size(min = 2, max = 100, message = "Le nom de la ville doit contenir entre 2 et 100 caractères")
     private String city;
+
+    private Set<SpaceBO> spaces = new HashSet<>();
 }

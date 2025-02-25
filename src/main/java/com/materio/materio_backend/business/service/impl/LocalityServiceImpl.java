@@ -5,13 +5,17 @@ import com.materio.materio_backend.business.exception.locality.LocalityNotEmptyE
 import com.materio.materio_backend.business.exception.locality.LocalityNotFoundException;
 import com.materio.materio_backend.business.service.LocalityService;
 import com.materio.materio_backend.dto.Locality.LocalityBO;
+import com.materio.materio_backend.dto.Locality.LocalityMapper;
 import com.materio.materio_backend.jpa.entity.Locality;
 import com.materio.materio_backend.jpa.repository.LocalityRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(rollbackOn = Exception.class)
@@ -21,64 +25,81 @@ public class LocalityServiceImpl implements LocalityService {
 
     @Autowired
     private LocalityRepository localityRepo;
+    @Autowired
+    private LocalityMapper localityMapper;
+
 
     @Override
-    public Locality createLocality(final LocalityBO localityBO) {
+    public LocalityBO createLocality(final LocalityBO localityBO) {
+
+        // Vérification de l'unicité du nom
         localityRepo.findByName(localityBO.getName())
                 .ifPresent(l -> {
                     throw new DuplicateLocalityException(localityBO.getName());
                 });
-        final Locality locality = new Locality();
-        updateLocalityFields(locality, localityBO);
-        return localityRepo.save(locality);
+
+        // Conversion et sauvegarde
+        Locality entity = localityMapper.boToEntity(localityBO);
+        Locality savedEntity = localityRepo.save(entity);
+
+        return localityMapper.entityToBO(savedEntity);
     }
 
     @Override
-    public Locality getLocalityByName(final String name) {
-        return localityRepo.findByName(name)
+    public LocalityBO getLocality(final String name) {
+
+        Locality entity = localityRepo.findByName(name)
                 .orElseThrow(() -> new LocalityNotFoundException(name));
+
+        return localityMapper.entityToBO(entity);
     }
 
     @Override
-    public List<Locality> getAllLocalities() {
-        return localityRepo.findAll();
+    public Set<LocalityBO> getAllLocalities() {
+
+        List<Locality> entities = localityRepo.findAll();
+        return entities.stream()
+                .map(localityMapper::entityToBO)
+                .collect(Collectors.toSet());
     }
 
     @Override
-    public Locality updateLocality(final String name, final LocalityBO localityBO) {
-        Locality locality = getLocalityByName(name);
+    public LocalityBO updateLocality(final String name, final LocalityBO localityBO) {
 
-        // Si le nom change, on vérifie qu'il n'existe pas déjà
-        if (!locality.getName().equals(localityBO.getName())) {
+        // Récupération de l'entité existante
+        Locality entity = localityRepo.findByName(name)
+                .orElseThrow(() -> new LocalityNotFoundException(name));
+
+        // Vérification si le nouveau nom n'existe pas déjà
+        if (!name.equals(localityBO.getName())) {
             localityRepo.findByName(localityBO.getName())
                     .ifPresent(l -> {
                         throw new DuplicateLocalityException(localityBO.getName());
                     });
         }
 
-        updateLocalityFields(locality, localityBO);
-        return localityRepo.save(locality);
+        // Mise à jour et sauvegarde
+        localityMapper.updateEntityFromBO(entity, localityBO);
+        Locality updatedEntity = localityRepo.save(entity);
+
+        return localityMapper.entityToBO(updatedEntity);
     }
 
     @Override
-    public void deleteLocality(String name) {
-        Locality locality = getLocalityByName(name);
+    public void deleteLocality(String localityName) {
 
-        // On vérifie si des salles contiennent des équipements
-        boolean hasEquipment = locality.getRooms().stream()
-                .anyMatch(room -> !room.getEquipments().isEmpty());
+        Locality entity = localityRepo.findByName(localityName)
+                .orElseThrow(() -> new LocalityNotFoundException(localityName));
+
+        // Vérification des équipements
+        boolean hasEquipment = entity.getSpaces().stream()
+                .flatMap(space -> space.getZones().stream())
+                .anyMatch(zone -> !zone.getEquipments().isEmpty());
 
         if (hasEquipment) {
-            throw new LocalityNotEmptyException(name);
+            throw new LocalityNotEmptyException(localityName);
         }
 
-        localityRepo.delete(locality);
-    }
-
-    private void updateLocalityFields(final Locality locality, final LocalityBO localityBO) {
-        locality.setName(localityBO.getName());
-        locality.setAddress(localityBO.getAddress());
-        locality.setCp(localityBO.getCp());
-        locality.setCity(localityBO.getCity());
+        localityRepo.delete(entity);
     }
 }
