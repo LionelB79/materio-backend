@@ -160,3 +160,12 @@ http://localhost:8080/api/equipment
     "spaceName":"Stockage",
     "localityName": "CDS Agile Macif"
 }
+
+GET
+Equipments
+http://localhost:8080/api/equipments
+http://localhost:8080/api/equipments/locality/Agence CGI Bessines
+http://localhost:8080/api/equipments/locality/CDS Agile Macif
+http://localhost:8080/api/equipments/space?localityName=Agence%20CGI%20Bessines&spaceName=Stockage
+http://localhost:8080/api/equipments/space?localityName=Agence%20CGI%20Bessines&spaceName=Etage
+http://localhost:8080/api/equipments/zone?localityName=Agence%20CGI%20Bessines&spaceName=Stockage&zoneName=zone%201
