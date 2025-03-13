@@ -46,7 +46,7 @@ public class LocalityController {
     public ResponseEntity<String> deleteLocality(@PathVariable String name) {
 
         localityService.deleteLocality(name);
-        return ResponseEntity.ok("Le lieu :" + name + " a été supprimé aveec succès");
+        return ResponseEntity.ok("Le lieu :" + name + " a été supprimé avec succès");
     }
 
     @GetMapping("/locality/{name}")
