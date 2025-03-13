@@ -1,18 +1,13 @@
 package com.materio.materio_backend.business.service.impl;
 
-import com.materio.materio_backend.business.exception.locality.LocalityNotFoundException;
 import com.materio.materio_backend.business.exception.space.SpaceNotFoundException;
 import com.materio.materio_backend.business.exception.zone.DuplicateZoneException;
 import com.materio.materio_backend.business.exception.zone.ZoneNotEmptyException;
 import com.materio.materio_backend.business.exception.zone.ZoneNotFoundException;
-import com.materio.materio_backend.business.service.LocalityService;
-import com.materio.materio_backend.business.service.SpaceService;
 import com.materio.materio_backend.business.service.ZoneService;
-import com.materio.materio_backend.dto.Space.SpaceBO;
 import com.materio.materio_backend.dto.Space.SpaceMapper;
 import com.materio.materio_backend.dto.Zone.ZoneBO;
 import com.materio.materio_backend.dto.Zone.ZoneMapper;
-import com.materio.materio_backend.jpa.entity.Locality;
 import com.materio.materio_backend.jpa.entity.Space;
 import com.materio.materio_backend.jpa.entity.Zone;
 import com.materio.materio_backend.jpa.repository.SpaceRepository;
@@ -24,26 +19,19 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
 @Service
 @Transactional
 public class ZoneServiceImpl implements ZoneService {
-
 
     @Autowired
     private ZoneRepository zoneRepository;
     @Autowired
     private ZoneMapper zoneMapper;
-
-    @Autowired
-    private LocalityService localityService;
-
-    @Autowired
-    private SpaceService spaceService;
-
     @Autowired
     private SpaceMapper spaceMapper;
-
-    @Autowired private SpaceRepository spaceRepository;
+    @Autowired
+    private SpaceRepository spaceRepository;
 
     @Override
     public ZoneBO createZone(ZoneBO zoneBO) {
