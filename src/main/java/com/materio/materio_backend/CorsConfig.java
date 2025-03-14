@@ -15,8 +15,9 @@ public class CorsConfig {
         CorsConfiguration config = new CorsConfiguration();
 
         // On définit quelles origines (domaines) sont autorisées à accéder à notre API backend
-        config.addAllowedOrigin("http://localhost:5173"); // URL de développement Vite
-        config.addAllowedOrigin("http://localhost:4173"); // URL de prévisualisation Vite
+       // config.addAllowedOrigin("http://localhost:5173"); // URL de développement Vite
+       // config.addAllowedOrigin("http://localhost:4173"); // URL de prévisualisation Vite
+        config.addAllowedOrigin("http://localhost:4200"); // URL de développement Angular
 
         // On définit quelles méthodes HTTP sont autorisées
         config.addAllowedMethod("GET");
