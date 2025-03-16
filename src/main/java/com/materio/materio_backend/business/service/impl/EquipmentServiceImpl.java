@@ -2,23 +2,25 @@ package com.materio.materio_backend.business.service.impl;
 
 import com.materio.materio_backend.business.exception.equipment.DuplicateEquipmentException;
 import com.materio.materio_backend.business.exception.equipment.EquipmentNotFoundException;
+import com.materio.materio_backend.business.exception.locality.LocalityNotFoundException;
+import com.materio.materio_backend.business.exception.space.SpaceNotFoundException;
 import com.materio.materio_backend.business.exception.zone.ZoneNotFoundException;
-import com.materio.materio_backend.business.service.*;
+import com.materio.materio_backend.business.service.EquipmentRefService;
+import com.materio.materio_backend.business.service.EquipmentService;
+import com.materio.materio_backend.business.service.ZoneService;
 import com.materio.materio_backend.dto.Equipment.EquipmentBO;
 import com.materio.materio_backend.dto.Equipment.EquipmentMapper;
-import com.materio.materio_backend.dto.Zone.ZoneBO;
 import com.materio.materio_backend.dto.Zone.ZoneMapper;
 import com.materio.materio_backend.jpa.entity.Equipment;
-
 import com.materio.materio_backend.jpa.entity.Zone;
 import com.materio.materio_backend.jpa.repository.EquipmentRepository;
+import com.materio.materio_backend.jpa.repository.LocalityRepository;
+import com.materio.materio_backend.jpa.repository.SpaceRepository;
 import com.materio.materio_backend.jpa.repository.ZoneRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -26,19 +28,21 @@ import java.util.stream.Collectors;
 @Transactional(rollbackOn = Exception.class)
 public class EquipmentServiceImpl implements EquipmentService {
     @Autowired
-    private SpaceService spaceService;
+    private SpaceRepository spaceRepository;
     @Autowired
     private EquipmentRepository equipmentRepo;
     @Autowired
     private EquipmentRefService equipmentRefService;
     @Autowired
-    private LocalityService localityService;
+    private LocalityRepository localityRepository;
     @Autowired
     private ZoneService zoneService;
     @Autowired
     private ZoneMapper zoneMapper;
-    @Autowired private EquipmentMapper equipmentMapper;
-    @Autowired private ZoneRepository zoneRepository;
+    @Autowired
+    private EquipmentMapper equipmentMapper;
+    @Autowired
+    private ZoneRepository zoneRepository;
 
 
     @Override
@@ -75,7 +79,7 @@ public class EquipmentServiceImpl implements EquipmentService {
 
     @Override
     public EquipmentBO getEquipment(final String serialNumber, final String referenceName) {
-         Equipment equipment = equipmentRepo.findByIdSerialNumberAndIdReferenceName(serialNumber, referenceName)
+        Equipment equipment = equipmentRepo.findByIdSerialNumberAndIdReferenceName(serialNumber, referenceName)
                 .orElseThrow(() -> new EquipmentNotFoundException(referenceName));
 
         return equipmentMapper.entityToBO(equipment);
@@ -122,9 +126,11 @@ public class EquipmentServiceImpl implements EquipmentService {
             String zoneName) {
 
         // On vérifie si la zone existe
-        zoneService.getZone(localityName, spaceName, zoneName);
+        zoneRepository.findByNameAndSpaceNameAndSpaceLocalityName(
+                        zoneName, spaceName, localityName)
+                .orElseThrow(() -> new ZoneNotFoundException(zoneName));
 
-       Set<Equipment> equipments =  equipmentRepo.findByZoneNameAndZoneSpaceNameAndZoneSpaceLocalityName(
+        Set<Equipment> equipments = equipmentRepo.findByZoneNameAndZoneSpaceNameAndZoneSpaceLocalityName(
                 zoneName, spaceName, localityName);
 
         return equipments.stream().map(equipment -> equipmentMapper.entityToBO(equipment)).collect(Collectors.toSet());
@@ -133,7 +139,8 @@ public class EquipmentServiceImpl implements EquipmentService {
     @Override
     public Set<EquipmentBO> getEquipmentsBySpace(String localityName, String spaceName) {
         // On vérifie si l'espace existe
-        spaceService.getSpace(localityName, spaceName);
+        spaceRepository.findByNameAndLocality_Name(spaceName, localityName)
+                .orElseThrow(() -> new SpaceNotFoundException(spaceName));
 
         Set<Equipment> equipments = equipmentRepo.findByZoneSpaceNameAndZoneSpaceLocalityName(
                 spaceName, localityName);
@@ -146,7 +153,8 @@ public class EquipmentServiceImpl implements EquipmentService {
     @Override
     public Set<EquipmentBO> getEquipmentsByLocality(String localityName) {
         // On vérifie si la localité existe
-        localityService.getLocality(localityName);
+        localityRepository.findByName(localityName)
+                .orElseThrow(() -> new LocalityNotFoundException(localityName));
 
         Set<Equipment> equipments = equipmentRepo.findByZoneSpaceLocalityName(localityName);
 

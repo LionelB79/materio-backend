@@ -4,18 +4,16 @@ import com.materio.materio_backend.business.exception.locality.LocalityNotFoundE
 import com.materio.materio_backend.business.exception.space.DuplicateSpaceException;
 import com.materio.materio_backend.business.exception.space.SpaceHasEquipedZonesException;
 import com.materio.materio_backend.business.exception.space.SpaceNotFoundException;
-import com.materio.materio_backend.dto.Locality.LocalityBO;
+import com.materio.materio_backend.business.service.SpaceService;
 import com.materio.materio_backend.dto.Locality.LocalityMapper;
 import com.materio.materio_backend.dto.Space.SpaceBO;
 import com.materio.materio_backend.dto.Space.SpaceMapper;
-import com.materio.materio_backend.business.service.SpaceService;
 import com.materio.materio_backend.jpa.entity.Locality;
 import com.materio.materio_backend.jpa.entity.Space;
 import com.materio.materio_backend.jpa.repository.LocalityRepository;
 import com.materio.materio_backend.jpa.repository.SpaceRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
@@ -27,23 +25,22 @@ public class SpaceServiceImpl implements SpaceService {
 
     @Autowired
     private SpaceRepository spaceRepo;
-    @Autowired
-    private LocalityServiceImpl localityService;
+
     @Autowired
     private SpaceMapper spaceMapper;
     @Autowired
     private LocalityMapper localityMapper;
-    @Autowired private LocalityRepository localityRepository;
+    @Autowired
+    private LocalityRepository localityRepository;
 
 
     @Override
     public SpaceBO createSpace(final SpaceBO spaceBO) {
-        // On vérifie que la localité existe via le service
-        final LocalityBO localityBO = localityService.getLocality(spaceBO.getLocalityName());
 
         // On récupère directement l'entité Locality depuis le repository
         Locality locality = localityRepository.findByName(spaceBO.getLocalityName())
                 .orElseThrow(() -> new LocalityNotFoundException(spaceBO.getLocalityName()));
+
 
         // On vérifie que l'espace n'existe pas déjà pour cette localité
         spaceRepo.findByNameAndLocality_Name(spaceBO.getName(), spaceBO.getLocalityName())
@@ -93,7 +90,8 @@ public class SpaceServiceImpl implements SpaceService {
 
     @Override
     public Set<SpaceBO> getSpacesByLocality(String localityName) {
-        localityService.getLocality(localityName);
+        localityRepository.findByName(localityName)
+                .orElseThrow(() -> new LocalityNotFoundException(localityName));
         Set<Space> spaces = spaceRepo.findByLocality_Name(localityName);
 
         return spaces.stream()

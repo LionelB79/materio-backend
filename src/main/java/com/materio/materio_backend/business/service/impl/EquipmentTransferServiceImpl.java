@@ -1,14 +1,19 @@
 package com.materio.materio_backend.business.service.impl;
 
 import com.materio.materio_backend.business.exception.equipment.EquipmentLocationMismatchException;
+import com.materio.materio_backend.business.exception.equipment.EquipmentNotFoundException;
 import com.materio.materio_backend.business.exception.transfer.TransferValidationException;
+import com.materio.materio_backend.business.exception.zone.ZoneNotFoundException;
 import com.materio.materio_backend.business.service.*;
 import com.materio.materio_backend.dto.Equipment.EquipmentBO;
 import com.materio.materio_backend.dto.Equipment.EquipmentMapper;
 import com.materio.materio_backend.dto.Transfer.*;
+import com.materio.materio_backend.jpa.entity.Equipment;
 import com.materio.materio_backend.jpa.entity.EquipmentTransfer;
+import com.materio.materio_backend.jpa.entity.Zone;
 import com.materio.materio_backend.jpa.repository.EquipmentRepository;
 import com.materio.materio_backend.jpa.repository.EquipmentTransferRepository;
+import com.materio.materio_backend.jpa.repository.ZoneRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,16 +27,13 @@ import java.util.stream.Collectors;
     @Transactional(rollbackOn = Exception.class)
     public class EquipmentTransferServiceImpl implements EquipmentTransferService {
 
-       @Autowired
-       private SpaceService spaceService;
+
        @Autowired
        private EquipmentRepository equipmentRepo;
        @Autowired
-       private EquipmentService equipmentService;
-       @Autowired
        private EquipmentTransferRepository equipmentTransferRepo;
        @Autowired
-       private ZoneService zoneService;
+       private ZoneRepository zoneRepository;
        @Autowired
        private EquipmentMapper equipmentMapper;
        @Autowired
@@ -50,14 +52,17 @@ import java.util.stream.Collectors;
 
            for (EquipmentToTransfer equipmentToTransfer : transferBO.getEquipments()) {
 
-               EquipmentBO equipment = equipmentService.getEquipment(
-                       equipmentToTransfer.getSerialNumber(),
-                       equipmentToTransfer.getReferenceName());
+               Equipment equipment = equipmentRepo.findByIdSerialNumberAndIdReferenceName(
+                               equipmentToTransfer.getSerialNumber(),
+                               equipmentToTransfer.getReferenceName())
+                       .orElseThrow(() -> new EquipmentNotFoundException(equipmentToTransfer.getReferenceName()));
 
-               validateCurrentLocation(equipment, equipmentToTransfer);
+               EquipmentBO equipmentBO = equipmentMapper.entityToBO(equipment);
+
+               validateCurrentLocation(equipmentBO, equipmentToTransfer);
 
                // Création et sauvegarde du transfert
-               EquipmentTransfer transfer = createTransferEntity(equipment, equipmentToTransfer, transferBO);
+               EquipmentTransfer transfer = createTransferEntity(equipmentBO, equipmentToTransfer, transferBO);
                EquipmentTransfer savedTransfer = equipmentTransferRepo.save(transfer);
 
                // Mise à jour de la localisation de l'équipement
@@ -71,10 +76,11 @@ import java.util.stream.Collectors;
 
        private void validateTargetZone(EquipmentTransferBO transferBO) {
            // Vérification de la zone cible
-           zoneService.getZone(
-                   transferBO.getTargetLocalityName(),
-                   transferBO.getTargetSpaceName(),
-                   transferBO.getTargetZoneName());
+           zoneRepository.findByNameAndSpaceNameAndSpaceLocalityName(
+                           transferBO.getTargetZoneName(),
+                           transferBO.getTargetSpaceName(),
+                           transferBO.getTargetLocalityName())
+                   .orElseThrow(() -> new ZoneNotFoundException(transferBO.getTargetZoneName()));
        }
 
        private void validateCurrentLocation(EquipmentBO equipment, EquipmentToTransfer equipmentToTransfer) {
@@ -113,12 +119,17 @@ import java.util.stream.Collectors;
            return transfer;
        }
 
-       private void updateEquipmentLocation(EquipmentBO equipment, EquipmentTransferBO transferBO) {
-           equipment.setZoneName(transferBO.getTargetZoneName());
-           equipment.setSpaceName(transferBO.getTargetSpaceName());
-           equipment.setLocalityName(transferBO.getTargetLocalityName());
+       private void updateEquipmentLocation(Equipment equipment, EquipmentTransferBO transferBO) {
+           // Récupérer la zone cible
+           Zone targetZone = zoneRepository.findByNameAndSpaceNameAndSpaceLocalityName(
+                           transferBO.getTargetZoneName(),
+                           transferBO.getTargetSpaceName(),
+                           transferBO.getTargetLocalityName())
+                   .orElseThrow(() -> new ZoneNotFoundException(transferBO.getTargetZoneName()));
 
-           equipmentService.updateEquipment(equipment);
+           // Mettre à jour directement
+           equipment.setZone(targetZone);
+           equipmentRepo.save(equipment);
        }
 
        @Override
@@ -134,10 +145,12 @@ import java.util.stream.Collectors;
            // Récupérer tous les équipements et vérifier qu'ils sont de la même localité
            Set<String> sourceLocalities = transferBO.getEquipments().stream()
                    .map(equipment -> {
-                       EquipmentBO eq = equipmentService.getEquipment(
-                               equipment.getSerialNumber(),
-                               equipment.getReferenceName());
-                       return eq.getLocalityName();
+                       Equipment eq = equipmentRepo.findByIdSerialNumberAndIdReferenceName(
+                                       equipment.getSerialNumber(),
+                                       equipment.getReferenceName())
+                               .orElseThrow(() -> new EquipmentNotFoundException(equipment.getReferenceName()));
+
+                       return eq.getZone().getSpace().getLocality().getName();
                    })
                    .collect(Collectors.toSet());
 
