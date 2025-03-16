@@ -46,7 +46,7 @@ public class LocalityServiceImplTest {
     private Locality localityEntity;
 
     @BeforeEach
-    void setUp() {
+    void initBeforeEach() {
 
         localityBO = new LocalityBO();
         localityBO.setName("TestLocality");
