@@ -1,4 +1,4 @@
-package com.materio.materio_backend;
+package com.materio.materio_backend.configs;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
