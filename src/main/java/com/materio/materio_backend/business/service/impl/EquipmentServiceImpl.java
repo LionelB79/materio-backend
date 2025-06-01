@@ -7,10 +7,8 @@ import com.materio.materio_backend.business.exception.space.SpaceNotFoundExcepti
 import com.materio.materio_backend.business.exception.zone.ZoneNotFoundException;
 import com.materio.materio_backend.business.service.EquipmentRefService;
 import com.materio.materio_backend.business.service.EquipmentService;
-import com.materio.materio_backend.business.service.ZoneService;
 import com.materio.materio_backend.dto.Equipment.EquipmentBO;
 import com.materio.materio_backend.dto.Equipment.EquipmentMapper;
-import com.materio.materio_backend.dto.Zone.ZoneMapper;
 import com.materio.materio_backend.jpa.entity.Equipment;
 import com.materio.materio_backend.jpa.entity.Zone;
 import com.materio.materio_backend.jpa.repository.EquipmentRepository;
@@ -36,33 +34,24 @@ public class EquipmentServiceImpl implements EquipmentService {
     @Autowired
     private LocalityRepository localityRepository;
     @Autowired
-    private ZoneService zoneService;
-    @Autowired
-    private ZoneMapper zoneMapper;
-    @Autowired
     private EquipmentMapper equipmentMapper;
     @Autowired
     private ZoneRepository zoneRepository;
 
-
     @Override
     public EquipmentBO createEquipment(final EquipmentBO equipmentBO) {
-        // On vérifie l'unicité du numéro de série pour cette référence
-        equipmentRepo.findByIdSerialNumberAndIdReferenceName(
-                        equipmentBO.getSerialNumber(),
-                        equipmentBO.getReferenceName())
-                .ifPresent(e -> {
-                    throw new DuplicateEquipmentException(
-                            equipmentBO.getReferenceName(),
-                            equipmentBO.getSerialNumber());
-                });
+        // Vérification de l'unicité
+        if (equipmentRepo.existsBySerialNumberAndReferenceName(
+                equipmentBO.getSerialNumber(),
+                equipmentBO.getReferenceName())) {
+            throw new DuplicateEquipmentException(
+                    equipmentBO.getReferenceName(),
+                    equipmentBO.getSerialNumber());
+        }
 
-        // On récupère récupére la zone depuis la base de données
-        Zone zone = zoneRepository.findByNameAndSpaceNameAndSpaceLocalityName(
-                        equipmentBO.getZoneName(),
-                        equipmentBO.getSpaceName(),
-                        equipmentBO.getLocalityName())
-                .orElseThrow(() -> new ZoneNotFoundException(equipmentBO.getZoneName()));
+        // On récupère la zone par ID
+        Zone zone = zoneRepository.findById(equipmentBO.getZoneId())
+                .orElseThrow(() -> new ZoneNotFoundException("ID: " + equipmentBO.getZoneId()));
 
         // Création de l'équipement
         Equipment equipment = equipmentMapper.boToEntity(equipmentBO);
@@ -73,45 +62,67 @@ public class EquipmentServiceImpl implements EquipmentService {
 
         // Sauvegarde
         Equipment savedEquipment = equipmentRepo.save(equipment);
+
+        // On retourne l'équipement avec l'ID de zone
         return equipmentMapper.entityToBO(savedEquipment);
     }
 
-
     @Override
-    public EquipmentBO getEquipment(final String serialNumber, final String referenceName) {
-        Equipment equipment = equipmentRepo.findByIdSerialNumberAndIdReferenceName(serialNumber, referenceName)
-                .orElseThrow(() -> new EquipmentNotFoundException(referenceName));
+    public EquipmentBO getEquipment(final Long id) {
+        Equipment equipment = equipmentRepo.findById(id)
+                .orElseThrow(() -> new EquipmentNotFoundException("ID: " + id));
 
         return equipmentMapper.entityToBO(equipment);
     }
 
     @Override
-    public EquipmentBO updateEquipment(final EquipmentBO equipmentBO) {
+    public EquipmentBO getEquipmentBySerialAndReference(final String serialNumber, final String referenceName) {
+        Equipment equipment = equipmentRepo.findBySerialNumberAndReferenceName(serialNumber, referenceName)
+                .orElseThrow(() -> new EquipmentNotFoundException(referenceName + " - " + serialNumber));
 
+        return equipmentMapper.entityToBO(equipment);
+    }
+
+    @Override
+    public EquipmentBO updateEquipment(final Long id, final EquipmentBO equipmentBO) {
         // On récupère l'équipement existant
-        Equipment equipment = equipmentRepo.findByIdSerialNumberAndIdReferenceName(equipmentBO.getSerialNumber(), equipmentBO.getReferenceName())
-                .orElseThrow(() -> new EquipmentNotFoundException(equipmentBO.getReferenceName()));
+        Equipment equipment = equipmentRepo.findById(id)
+                .orElseThrow(() -> new EquipmentNotFoundException("ID: " + id));
 
-        Zone zone = zoneRepository.findByNameAndSpaceNameAndSpaceLocalityName(equipmentBO.getZoneName(), equipmentBO.getSpaceName(), equipmentBO.getLocalityName())
-                .orElseThrow(() -> new ZoneNotFoundException(equipmentBO.getZoneName()));
+        // Si zoneId est fourni, on met à jour la zone
+        if (equipmentBO.getZoneId() != null) {
+            Zone zone = zoneRepository.findById(equipmentBO.getZoneId())
+                    .orElseThrow(() -> new ZoneNotFoundException("ID: " + equipmentBO.getZoneId()));
+            equipment.setZone(zone);
+        }
 
-        // Mise à jour uniquement des informations de base de l'équipement
+        // Mise à jour des informations de base de l'équipement
         equipment.setPurchaseDate(equipmentBO.getPurchaseDate());
         equipment.setDescription(equipmentBO.getDescription());
         equipment.setMark(equipmentBO.getMark());
         equipment.setTag(equipmentBO.getTag());
         equipment.setBarcode(equipmentBO.getBarCode());
-        equipment.setZone(zone);
+
         equipmentRepo.save(equipment);
 
         return equipmentMapper.entityToBO(equipment);
     }
 
     @Override
-    public void deleteEquipment(final String serialNumber, final String referenceName) {
+    public void deleteEquipment(final Long id) {
+        Equipment equipment = equipmentRepo.findById(id)
+                .orElseThrow(() -> new EquipmentNotFoundException("ID: " + id));
 
-        Equipment equipment = equipmentRepo.findByIdSerialNumberAndIdReferenceName(serialNumber, referenceName)
-                .orElseThrow(() -> new EquipmentNotFoundException(referenceName));
+        // Décrémentation du compteur de référence
+        equipmentRefService.decrementQuantity(equipment.getReferenceName());
+
+        equipmentRepo.delete(equipment);
+    }
+
+    @Override
+    public void deleteEquipmentBySerialAndReference(final String serialNumber, final String referenceName) {
+        Equipment equipment = equipmentRepo.findBySerialNumberAndReferenceName(serialNumber, referenceName)
+                .orElseThrow(() -> new EquipmentNotFoundException(referenceName + " - " + serialNumber));
 
         // Décrémentation du compteur de référence
         equipmentRefService.decrementQuantity(referenceName);
@@ -133,17 +144,45 @@ public class EquipmentServiceImpl implements EquipmentService {
         Set<Equipment> equipments = equipmentRepo.findByZoneNameAndZoneSpaceNameAndZoneSpaceLocalityName(
                 zoneName, spaceName, localityName);
 
-        return equipments.stream().map(equipment -> equipmentMapper.entityToBO(equipment)).collect(Collectors.toSet());
+        return equipments.stream()
+                .map(equipment -> equipmentMapper.entityToBO(equipment))
+                .collect(Collectors.toSet());
+    }
+    @Override
+    public Set<EquipmentBO> getEquipmentsByZoneId(Long zoneId) {
+        // Vérifier que la zone existe
+        if (!zoneRepository.existsById(zoneId)) {
+            throw new ZoneNotFoundException("ID: " + zoneId);
+        }
+
+        Set<Equipment> equipments = equipmentRepo.findByZoneId(zoneId);
+
+        return equipments.stream()
+                .map(equipmentMapper::entityToBO)
+                .collect(Collectors.toSet());
     }
 
     @Override
-    public Set<EquipmentBO> getEquipmentsBySpace(String localityName, String spaceName) {
-        // On vérifie si l'espace existe
-        spaceRepository.findByNameAndLocality_Name(spaceName, localityName)
-                .orElseThrow(() -> new SpaceNotFoundException(spaceName));
+    public Set<EquipmentBO> getEquipmentsByLocalityId(Long localityId) {
+        // Vérifier que la localité existe
+        if (!localityRepository.existsById(localityId)) {
+            throw new LocalityNotFoundException("ID: " + localityId);
+        }
 
-        Set<Equipment> equipments = equipmentRepo.findByZoneSpaceNameAndZoneSpaceLocalityName(
-                spaceName, localityName);
+        Set<Equipment> equipments = equipmentRepo.findByZoneSpaceLocalityId(localityId);
+
+        return equipments.stream()
+                .map(equipmentMapper::entityToBO)
+                .collect(Collectors.toSet());
+    }
+    @Override
+    public Set<EquipmentBO> getEquipmentsBySpaceId(Long spaceId) {
+        // Vérifier que l'espace existe
+        if (!spaceRepository.existsById(spaceId)) {
+            throw new SpaceNotFoundException("ID: " + spaceId);
+        }
+
+        Set<Equipment> equipments = equipmentRepo.findByZoneSpaceId(spaceId);
 
         return equipments.stream()
                 .map(equipmentMapper::entityToBO)

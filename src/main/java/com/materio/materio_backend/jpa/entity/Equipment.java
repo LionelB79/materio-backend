@@ -6,7 +6,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Size;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -20,8 +19,17 @@ import java.time.LocalDate;
 @Table(name = "t_equipment")
 public class Equipment extends BaseEntity {
 
- @EmbeddedId
- private EquipmentPK id = new EquipmentPK();
+ @Id
+ @GeneratedValue(strategy = GenerationType.IDENTITY)
+ private Long id;
+
+ @NotBlank(message = "Le nom de référence est obligatoire")
+ @Column(name = "reference_name", nullable = false)
+ private String referenceName;
+
+ @NotBlank(message = "Le numéro de série est obligatoire")
+ @Column(name = "serial_number", nullable = false)
+ private String serialNumber;
 
  @NotNull(message = "La date d'achat est obligatoire")
  @Past(message = "La date d'achat doit être dans le passé")
@@ -47,22 +55,4 @@ public class Equipment extends BaseEntity {
 
  @Column(name = "barcode")
  private Integer barcode;
-
- @Transient
- public String getSerialNumber() {
-  return id.getSerialNumber();
- }
-
- public void setSerialNumber(String serialNumber) {
-  id.setSerialNumber(serialNumber);
- }
-
- @Transient
- public String getReferenceName() {
-  return id.getReferenceName();
- }
-
- public void setReferenceName(String referenceName) {
-  id.setReferenceName(referenceName);
- }
 }

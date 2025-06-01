@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,9 +20,8 @@ import java.util.List;
 import java.util.Set;
 
 @RestController
-@RequestMapping(value = "/api", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping("/")
 public class SpaceController {
-    private static final Logger logger = LoggerFactory.getLogger(SpaceController.class);
 
     @Autowired
     private SpaceService spaceService;
@@ -29,34 +29,48 @@ public class SpaceController {
     @Autowired
     private SpaceMapper spaceMapper;
 
-    @PostMapping(value = "/space")
-    public ResponseEntity<String> createSpace(@Valid @RequestBody SpaceVO spaceVO) {
-
-        spaceService.createSpace(spaceMapper.voToBO(spaceVO));
-        return ResponseEntity.ok("l'espace " + spaceVO.getName() + " a été créé");
+    @PostMapping(value ="/space",consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<SpaceVO> createSpace(@Valid @RequestBody SpaceVO spaceVO) {
+        SpaceBO spaceBO = spaceMapper.voToBO(spaceVO);
+        SpaceBO createdSpace = spaceService.createSpace(spaceBO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(spaceMapper.boToVO(createdSpace));
     }
 
-
-    @DeleteMapping(value = "/space/{spaceName}")
-    public ResponseEntity<String> deleteRoom(@RequestParam String locality, @PathVariable String spaceName) {
-
-        spaceService.deleteSpace(locality, spaceName);
-        return ResponseEntity.ok("La salle " + spaceName + " a été supprimée");
+    @GetMapping("/space/{id}")
+    public ResponseEntity<SpaceVO> getSpace(@PathVariable Long id) {
+        SpaceBO space = spaceService.getSpace(id);
+        return ResponseEntity.ok(spaceMapper.boToVO(space));
     }
 
-    @GetMapping(value = "/spaces")
-    public ResponseEntity<List<SpaceVO>> getAllSapces(@RequestParam String localityName) {
-        Set<SpaceBO> spaces = spaceService.getSpacesByLocality(localityName);
+    @PutMapping("/space/{id}")
+    public ResponseEntity<SpaceVO> updateSpace(
+            @PathVariable Long id,
+            @Valid @RequestBody SpaceVO spaceVO) {
+        SpaceBO spaceBO = spaceMapper.voToBO(spaceVO);
+        SpaceBO updatedSpace = spaceService.updateSpace(id, spaceBO);
+        return ResponseEntity.ok(spaceMapper.boToVO(updatedSpace));
+    }
 
+    @DeleteMapping("/space/{id}")
+    public ResponseEntity<Void> deleteSpace(@PathVariable Long id) {
+        spaceService.deleteSpace(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/spaces/{localityId}")
+    public ResponseEntity<List<SpaceVO>> getSpacesByLocality(@PathVariable Long localityId) {
+        Set<SpaceBO> spaces = spaceService.getSpacesByLocalityId(localityId);
         return ResponseEntity.ok(spaces.stream()
                 .map(space -> spaceMapper.boToVO(space))
                 .toList());
     }
 
-    @GetMapping(value = "/space")
-    public ResponseEntity<SpaceVO> getSpace(@RequestParam String localityName, @PathVariable String spaceName) {
-        SpaceBO space = spaceService.getSpace(localityName, spaceName);
-
+    // Endpoint de compatibilité pour recherche par nom et localité
+    @GetMapping("/space/search")
+    public ResponseEntity<SpaceVO> getSpaceByNameAndLocality(
+            @RequestParam Long localityId,
+            @RequestParam String name) {
+        SpaceBO space = spaceService.getSpaceByNameAndLocalityId(localityId, name);
         return ResponseEntity.ok(spaceMapper.boToVO(space));
     }
 }

@@ -20,6 +20,7 @@ public class LocalityMapper {
         if (bo == null) return null;
 
         Locality entity = new Locality();
+        entity.setId(bo.getId());
         entity.setName(bo.getName());
         entity.setAddress(bo.getAddress());
         entity.setCp(bo.getCp());
@@ -27,10 +28,13 @@ public class LocalityMapper {
         return entity;
     }
 
+
+
     public LocalityBO entityToBO(Locality entity) {
         if (entity == null) return null;
 
         LocalityBO bo = new LocalityBO();
+        bo.setId(entity.getId());
         bo.setName(entity.getName());
         bo.setAddress(entity.getAddress());
         bo.setCp(entity.getCp());
@@ -50,6 +54,7 @@ public class LocalityMapper {
         if (bo == null) return null;
 
         LocalityVO vo = new LocalityVO();
+        vo.setId(bo.getId());
         vo.setName(bo.getName());
         vo.setAddress(bo.getAddress());
         vo.setCp(bo.getCp());
@@ -68,6 +73,7 @@ public class LocalityMapper {
         if (vo == null) return null;
 
         LocalityBO bo = new LocalityBO();
+        bo.setId(vo.getId());
         bo.setName(vo.getName());
         bo.setAddress(vo.getAddress());
         bo.setCp(vo.getCp());

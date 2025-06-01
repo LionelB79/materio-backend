@@ -10,5 +10,5 @@ import java.util.Optional;
 @Repository
 public interface LocalityRepository extends JpaRepository<Locality, Long> {
     Optional<Locality> findByName(String name);
-
+    boolean existsByName(String name);
 }

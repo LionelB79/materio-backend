@@ -1,6 +1,7 @@
 package com.materio.materio_backend.business.service;
 
 
+
 import com.materio.materio_backend.jpa.repository.LocalityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

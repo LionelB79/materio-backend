@@ -26,34 +26,26 @@ public class ZoneServiceImpl implements ZoneService {
 
     @Autowired
     private ZoneRepository zoneRepository;
+
     @Autowired
     private ZoneMapper zoneMapper;
-    @Autowired
-    private SpaceMapper spaceMapper;
+
     @Autowired
     private SpaceRepository spaceRepository;
 
     @Override
     public ZoneBO createZone(ZoneBO zoneBO) {
-        // Vérifie l'existence de l'espace parent et récupère l'entité Space
-        Space space = spaceRepository.findByNameAndLocality_Name(
-                        zoneBO.getSpaceName(),
-                        zoneBO.getLocalityName())
-                .orElseThrow(() -> new SpaceNotFoundException(zoneBO.getSpaceName()));
+        // Vérifie l'existence de l'espace parent
+        Space space = spaceRepository.findById(zoneBO.getSpaceId())
+                .orElseThrow(() -> new SpaceNotFoundException("ID: " + zoneBO.getSpaceId()));
 
         // Vérification de l'unicité de la zone dans cet espace
-        zoneRepository.findByNameAndSpaceNameAndSpaceLocalityName(
-                        zoneBO.getName(),
-                        zoneBO.getSpaceName(),
-                        zoneBO.getLocalityName())
-                .ifPresent(z -> {
-                    throw new DuplicateZoneException(zoneBO.getName());
-                });
+        if (zoneRepository.existsByNameAndSpaceId(zoneBO.getName(), zoneBO.getSpaceId())) {
+            throw new DuplicateZoneException(zoneBO.getName());
+        }
 
         // Conversion en entité pour la persistance
         Zone entity = zoneMapper.boToEntity(zoneBO);
-
-        // Association avec l'espace existant
         entity.setSpace(space);
 
         // Sauvegarde et reconversion en BO pour le retour
@@ -62,60 +54,68 @@ public class ZoneServiceImpl implements ZoneService {
     }
 
     @Override
-    public ZoneBO updateZone(ZoneBO zoneBO) {
-
+    public ZoneBO updateZone(Long id, ZoneBO zoneBO) {
         // Récupération de l'entité existante
-        Zone existingZone = zoneRepository.findByNameAndSpaceNameAndSpaceLocalityName(
-                zoneBO.getName(),
-                zoneBO.getSpaceName(),
-                zoneBO.getLocalityName()
-        ).orElseThrow(() -> new ZoneNotFoundException(zoneBO.getName()));
+        Zone existingZone = zoneRepository.findById(id)
+                .orElseThrow(() -> new ZoneNotFoundException("ID: " + id));
+
+        // Si le nom change, vérifier l'unicité
+        if (!existingZone.getName().equals(zoneBO.getName()) &&
+                zoneRepository.existsByNameAndSpaceId(zoneBO.getName(), existingZone.getSpace().getId())) {
+            throw new DuplicateZoneException(zoneBO.getName());
+        }
+
+        // Si l'espace change
+        if (!existingZone.getSpace().getId().equals(zoneBO.getSpaceId())) {
+            Space newSpace = spaceRepository.findById(zoneBO.getSpaceId())
+                    .orElseThrow(() -> new SpaceNotFoundException("ID: " + zoneBO.getSpaceId()));
+            existingZone.setSpace(newSpace);
+        }
 
         // Mise à jour des champs modifiables
         zoneMapper.updateEntityFromBO(existingZone, zoneBO);
 
         // Sauvegarde et reconversion en BO
         Zone updatedEntity = zoneRepository.save(existingZone);
-
         return zoneMapper.entityToBO(updatedEntity);
     }
 
     @Override
-    public void deleteZone(String localityName, String spaceName, String zoneName) {
-
-
-        Zone zone = zoneRepository.findByNameAndSpaceNameAndSpaceLocalityName(
-                zoneName, spaceName, localityName
-        ).orElseThrow(() -> new ZoneNotFoundException(zoneName));
+    public void deleteZone(Long id) {
+        Zone zone = zoneRepository.findById(id)
+                .orElseThrow(() -> new ZoneNotFoundException("ID: " + id));
 
         // Vérification si la zone contient des équipements
         if (!zone.getEquipments().isEmpty()) {
-            throw new ZoneNotEmptyException(zoneName);
+            throw new ZoneNotEmptyException(zone.getName());
         }
 
         zoneRepository.delete(zone);
     }
 
     @Override
-    public ZoneBO getZone(String localityName, String spaceName, String zoneName) {
-
-        Zone entity = zoneRepository.findByNameAndSpaceNameAndSpaceLocalityName(
-                zoneName, spaceName, localityName
-        ).orElseThrow(() -> new ZoneNotFoundException(zoneName));
-
+    public ZoneBO getZone(Long id) {
+        Zone entity = zoneRepository.findById(id)
+                .orElseThrow(() -> new ZoneNotFoundException("ID: " + id));
         return zoneMapper.entityToBO(entity);
     }
 
     @Override
-    public Set<ZoneBO> getZones(String localityName, String spaceName) {
+    public Set<ZoneBO> getZonesBySpaceId(Long spaceId) {
+        // Vérifier que l'espace existe
+        if (!spaceRepository.existsById(spaceId)) {
+            throw new SpaceNotFoundException("ID: " + spaceId);
+        }
 
-        List<Zone> entities = zoneRepository.findBySpaceNameAndSpaceLocalityName(
-                spaceName, localityName
-        );
-
-        return entities.stream()
+        return zoneRepository.findBySpaceId(spaceId).stream()
                 .map(zoneMapper::entityToBO)
                 .collect(Collectors.toSet());
     }
 
+    @Override
+    public ZoneBO getZoneByNameAndSpaceId(String zoneName, Long spaceId) {
+        Zone zone = zoneRepository.findByNameAndSpaceId(zoneName, spaceId)
+                .orElseThrow(() -> new ZoneNotFoundException(zoneName));
+        return zoneMapper.entityToBO(zone);
+    }
 }

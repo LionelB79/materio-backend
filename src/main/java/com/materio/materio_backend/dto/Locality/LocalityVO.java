@@ -9,6 +9,7 @@ import java.util.Set;
 
 @Data
 public class LocalityVO {
+    private Long id;
     private String name;
     private String address;
     private Integer cp;

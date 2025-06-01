@@ -7,6 +7,7 @@ import com.materio.materio_backend.dto.Locality.LocalityVO;
 import com.materio.materio_backend.jpa.entity.Locality;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +16,7 @@ import java.util.List;
 import java.util.Set;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/")
 public class LocalityController {
 
     @Autowired
@@ -24,44 +25,45 @@ public class LocalityController {
     @Autowired
     private LocalityMapper localityMapper;
 
-    @PostMapping(value = "/locality", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value ="/locality",consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<LocalityVO> createLocality(@Valid @RequestBody final LocalityBO localityBO) {
-
         final LocalityBO createdLocality = localityService.createLocality(localityBO);
         LocalityVO localityVO = localityMapper.boToVO(createdLocality);
-        return ResponseEntity.ok(localityVO);
-
+        return ResponseEntity.status(HttpStatus.CREATED).body(localityVO);
     }
 
-    @PutMapping("/locality/{name}")
-    public ResponseEntity<LocalityVO> updateLocality(
-            @PathVariable String name,
-            @Valid @RequestBody LocalityBO localityBO) {
+    @GetMapping("/locality/{id}")
+    public ResponseEntity<LocalityVO> getLocality(@PathVariable Long id) {
+        final LocalityBO localityBO = localityService.getLocality(id);
+        return ResponseEntity.ok(localityMapper.boToVO(localityBO));
+    }
 
-        final LocalityBO updatedLocality = localityService.updateLocality(name, localityBO);
+    @PutMapping("/locality/{id}")
+    public ResponseEntity<LocalityVO> updateLocality(
+            @PathVariable Long id,
+            @Valid @RequestBody LocalityBO localityBO) {
+        final LocalityBO updatedLocality = localityService.updateLocality(id, localityBO);
         return ResponseEntity.ok(localityMapper.boToVO(updatedLocality));
     }
 
-    @DeleteMapping("/locality/{name}")
-    public ResponseEntity<String> deleteLocality(@PathVariable String name) {
-
-        localityService.deleteLocality(name);
-        return ResponseEntity.ok("Le lieu :" + name + " a été supprimé avec succès");
-    }
-
-    @GetMapping("/locality/{name}")
-    public ResponseEntity<LocalityVO> getLocality(@PathVariable String name) {
-        final LocalityBO localityBO = localityService.getLocality(name);
-
-        return ResponseEntity.ok(localityMapper.boToVO(localityBO));
+    @DeleteMapping("/locality/{id}")
+    public ResponseEntity<Void> deleteLocality(@PathVariable Long id) {
+        localityService.deleteLocality(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/localities")
     public ResponseEntity<List<LocalityVO>> getAllLocalities() {
         final Set<LocalityBO> localities = localityService.getAllLocalities();
-
         return ResponseEntity.ok(localities.stream()
-                .map((locality) -> localityMapper.boToVO(locality)
-                ).toList());
+                .map(localityMapper::boToVO)
+                .toList());
+    }
+
+    // Endpoint de recherche par nom (pour la compatibilité)
+    @GetMapping("/locality/search")
+    public ResponseEntity<LocalityVO> getLocalityByName(@RequestParam String name) {
+        final LocalityBO localityBO = localityService.getLocalityByName(name);
+        return ResponseEntity.ok(localityMapper.boToVO(localityBO));
     }
 }

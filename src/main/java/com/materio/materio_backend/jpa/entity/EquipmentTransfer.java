@@ -21,19 +21,14 @@ public class EquipmentTransfer extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumns({
-            @JoinColumn(name = "equipment_reference_name",
-                    referencedColumnName = "equipment_reference_name"),
-            @JoinColumn(name = "equipment_serial_number",
-                    referencedColumnName = "equipment_serial_number")
-    })
+    @JoinColumn(name = "equipment_id")
     private Equipment equipment;
 
-    @Column(name = "from_zone")
-    private String fromZone;
+    @Column(name = "from_zone_id")
+    private Long fromZoneId;
 
-    @Column(name = "to_zone")
-    private String toZone;
+    @Column(name = "to_zone_id")
+    private Long toZoneId;
 
     @Column(name = "transfer_date")
     private LocalDateTime transferDate;
@@ -41,16 +36,4 @@ public class EquipmentTransfer extends BaseEntity {
     @Size(max = 1000)
     @Column(name = "transfer_details")
     private String details;
-
-    @Column(name = "from_locality")
-    private String fromLocality;
-
-    @Column(name = "to_locality")
-    private String toLocality;
-
-    @Column(name = "from_space")
-    private String fromSpace;
-
-    @Column(name = "to_space")
-    private String toSpace;
 }
