@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,6 +26,7 @@ public class EquipmentTransferController {
     private EquipmentTransferMapper transferMapper;
 
     @PostMapping
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<Set<EquipmentTransferVO>> transferEquipments(
             @Valid @RequestBody EquipmentTransferVO transferVO) {
         EquipmentTransferBO transferBO = transferMapper.voToBO(transferVO);
@@ -34,6 +36,7 @@ public class EquipmentTransferController {
     }
 
     @GetMapping("/equipment/{equipmentId}")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<Set<TransferHistoryVO>> getTransferHistory(
             @PathVariable Long equipmentId) {
         Set<TransferHistoryVO> history = transferService.getTransferHistory(equipmentId);

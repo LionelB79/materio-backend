@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,6 +26,7 @@ public class ZoneController {
     private ZoneMapper zoneMapper;
 
     @PostMapping(value ="/zone",consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.CREATED)
     public ZoneVO createZone(@Valid @RequestBody ZoneVO zoneVO) {
         ZoneBO zoneBO = zoneMapper.voToBO(zoneVO);
@@ -33,12 +35,14 @@ public class ZoneController {
     }
 
     @GetMapping("/zone/{id}")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ZoneVO getZone(@PathVariable Long id) {
         ZoneBO zoneBO = zoneService.getZone(id);
         return zoneMapper.boToVO(zoneBO);
     }
 
     @PutMapping("/zone/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ZoneVO updateZone(
             @PathVariable Long id,
             @Valid @RequestBody ZoneVO zoneVO) {
@@ -48,12 +52,14 @@ public class ZoneController {
     }
 
     @DeleteMapping("/zone/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteZone(@PathVariable Long id) {
         zoneService.deleteZone(id);
     }
 
     @GetMapping("/zones/{spaceId}")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public Set<ZoneVO> getZonesBySpace(@PathVariable Long spaceId) {
         Set<ZoneBO> zones = zoneService.getZonesBySpaceId(spaceId);
         return zones.stream()
@@ -63,6 +69,7 @@ public class ZoneController {
 
     // Endpoint de compatibilité
     @GetMapping("/search")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ZoneVO getZoneByNameAndSpace(
             @RequestParam String name,
             @RequestParam Long spaceId) {

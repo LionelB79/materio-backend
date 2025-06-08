@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Set;
@@ -24,6 +25,7 @@ public class EquipmentController {
     private EquipmentMapper equipmentMapper;
 
     @PostMapping(value = "/equipment", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<EquipmentVO> createEquipment(@Valid @RequestBody EquipmentBO equipmentBO) {
         final EquipmentBO created = equipmentService.createEquipment(equipmentBO);
         final EquipmentVO response = equipmentMapper.boToVO(created);
@@ -31,12 +33,14 @@ public class EquipmentController {
     }
 
     @GetMapping("/equipment/{id}")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<EquipmentVO> getEquipment(@PathVariable Long id) {
         EquipmentBO equipment = equipmentService.getEquipment(id);
         return ResponseEntity.ok(equipmentMapper.boToVO(equipment));
     }
 
     @PutMapping("/equipment/{id}")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<EquipmentVO> updateEquipment(
             @PathVariable Long id,
             @Valid @RequestBody EquipmentVO equipmentVO) {
@@ -46,6 +50,7 @@ public class EquipmentController {
     }
 
     @DeleteMapping("/equipment/{id}")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<Void> deleteEquipment(@PathVariable Long id) {
         equipmentService.deleteEquipment(id);
         return ResponseEntity.noContent().build();
@@ -53,6 +58,7 @@ public class EquipmentController {
 
     // Nouvelles méthodes utilisant les IDs
     @GetMapping("/equipment/zone/{zoneId}")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<Set<EquipmentVO>> getEquipmentsByZoneId(@PathVariable Long zoneId) {
         Set<EquipmentBO> equipments = equipmentService.getEquipmentsByZoneId(zoneId);
         Set<EquipmentVO> response = equipments.stream()
@@ -62,6 +68,7 @@ public class EquipmentController {
     }
 
     @GetMapping("/equipment/space/{spaceId}")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<Set<EquipmentVO>> getEquipmentsBySpaceId(@PathVariable Long spaceId) {
         Set<EquipmentBO> equipments = equipmentService.getEquipmentsBySpaceId(spaceId);
         Set<EquipmentVO> response = equipments.stream()
@@ -71,6 +78,7 @@ public class EquipmentController {
     }
 
     @GetMapping("/equipment/locality/{localityId}")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<Set<EquipmentVO>> getEquipmentsByLocalityId(@PathVariable Long localityId) {
         Set<EquipmentBO> equipments = equipmentService.getEquipmentsByLocalityId(localityId);
         Set<EquipmentVO> response = equipments.stream()
@@ -82,6 +90,7 @@ public class EquipmentController {
     // Méthodes de compatibilité (à déprécier dans le futur)
     @Deprecated
     @GetMapping("/equipment/search")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<EquipmentVO> getEquipmentBySerialAndReference(
             @RequestParam String referenceName,
             @RequestParam String serialNumber) {
@@ -91,6 +100,7 @@ public class EquipmentController {
 
     @Deprecated
     @DeleteMapping("/equipment/search")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<Void> deleteEquipmentBySerialAndReference(
             @RequestParam String referenceName,
             @RequestParam String serialNumber) {
@@ -100,6 +110,7 @@ public class EquipmentController {
 
     @Deprecated
     @GetMapping("/equipment/zone")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<Set<EquipmentVO>> getEquipmentsByZone(
             @RequestParam String localityName,
             @RequestParam String spaceName,
@@ -114,6 +125,7 @@ public class EquipmentController {
 
     @Deprecated
     @GetMapping("/{localityName}")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<Set<EquipmentVO>> getEquipmentsByLocality(
             @PathVariable String localityName) {
         Set<EquipmentBO> equipments = equipmentService.getEquipmentsByLocality(localityName);
@@ -124,6 +136,7 @@ public class EquipmentController {
     }
 
     @GetMapping("/")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<Set<EquipmentVO>> getAllEquipments() {
         Set<EquipmentBO> equipments = equipmentService.getAllEquipments();
         Set<EquipmentVO> response = equipments.stream()

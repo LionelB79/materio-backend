@@ -32,8 +32,8 @@ public class CorsConfig {
         // Important pour quand on voudra utiliser l'authentification basée sur les sessions
         config.setAllowCredentials(true);
 
-        // Applique cette configuration à tous les endpoints commençant par "/api/"
-        source.registerCorsConfiguration("/api/**", config);
+        // Applique cette configuration à tous les endpoints commençant par "/"
+        source.registerCorsConfiguration("/**", config);
 
         // Crée et retourne le filtre CORS avec cette configuration
         return new CorsFilter(source);

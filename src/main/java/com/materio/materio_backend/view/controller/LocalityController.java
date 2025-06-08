@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,6 +27,7 @@ public class LocalityController {
     private LocalityMapper localityMapper;
 
     @PostMapping(value ="/locality",consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<LocalityVO> createLocality(@Valid @RequestBody final LocalityBO localityBO) {
         final LocalityBO createdLocality = localityService.createLocality(localityBO);
         LocalityVO localityVO = localityMapper.boToVO(createdLocality);
@@ -33,12 +35,14 @@ public class LocalityController {
     }
 
     @GetMapping("/locality/{id}")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<LocalityVO> getLocality(@PathVariable Long id) {
         final LocalityBO localityBO = localityService.getLocality(id);
         return ResponseEntity.ok(localityMapper.boToVO(localityBO));
     }
 
     @PutMapping("/locality/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<LocalityVO> updateLocality(
             @PathVariable Long id,
             @Valid @RequestBody LocalityBO localityBO) {
@@ -47,12 +51,14 @@ public class LocalityController {
     }
 
     @DeleteMapping("/locality/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteLocality(@PathVariable Long id) {
         localityService.deleteLocality(id);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/localities")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<List<LocalityVO>> getAllLocalities() {
         final Set<LocalityBO> localities = localityService.getAllLocalities();
         return ResponseEntity.ok(localities.stream()
@@ -62,6 +68,7 @@ public class LocalityController {
 
     // Endpoint de recherche par nom (pour la compatibilité)
     @GetMapping("/locality/search")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<LocalityVO> getLocalityByName(@RequestParam String name) {
         final LocalityBO localityBO = localityService.getLocalityByName(name);
         return ResponseEntity.ok(localityMapper.boToVO(localityBO));

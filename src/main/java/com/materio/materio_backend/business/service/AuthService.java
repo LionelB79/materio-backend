@@ -11,6 +11,7 @@ import com.materio.materio_backend.jpa.entity.user.Role;
 import com.materio.materio_backend.jpa.entity.user.User;
 import com.materio.materio_backend.jpa.repository.RoleRepository;
 import com.materio.materio_backend.jpa.repository.UserRepository;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -46,6 +47,27 @@ public class AuthService {
 
     @Autowired
     private JwtUtils jwtUtils;
+
+
+    // Méthode pour initialiser les rôles avec des IDs spécifiques
+    @PostConstruct
+    public void initRoles() {
+        try {
+            // Vérifier chaque rôle individuellement et le créer seulement s'il n'existe pas déjà
+            if (roleRepository.findByName(EnumRole.ROLE_USER).isEmpty()) {
+                Role userRole = new Role(EnumRole.ROLE_USER);
+                roleRepository.save(userRole);
+            }
+
+            if (roleRepository.findByName(EnumRole.ROLE_ADMIN).isEmpty()) {
+                Role adminRole = new Role(EnumRole.ROLE_ADMIN);
+                roleRepository.save(adminRole);
+            }
+        } catch (Exception e) {
+            // Log l'erreur mais ne pas faire échouer l'initialisation de l'application
+            System.err.println("Erreur lors de l'initialisation des rôles: " + e.getMessage());
+        }
+    }
 
     /**
      * Authentifie un utilisateur et génère un token JWT
@@ -85,31 +107,36 @@ public class AuthService {
         }
 
         // Création du nouvel utilisateur
-        User user = new User(signUpRequest.getUsername(),
+        User user = new User(
+                signUpRequest.getUsername(),
                 signUpRequest.getEmail(),
-                encoder.encode(signUpRequest.getPassword()));
-
+                encoder.encode(signUpRequest.getPassword())
+        );
         user.setFirstName(signUpRequest.getFirstName());
         user.setLastName(signUpRequest.getLastName());
 
+        // Attribution des rôles en utilisant les IDs
         Set<String> strRoles = signUpRequest.getRoles();
         Set<Role> roles = new HashSet<>();
 
         if (strRoles == null || strRoles.isEmpty()) {
-            Role userRole = roleRepository.findByName(EnumRole.ROLE_USER)
-                    .orElseThrow(() -> new RuntimeException("Le rôle USER n'est pas trouvé."));
+            // Rôle par défaut - utilisateur (ID 1)
+            Role userRole = roleRepository.findById(1)
+                    .orElseThrow(() -> new RuntimeException("Rôle non trouvé"));
             roles.add(userRole);
         } else {
             strRoles.forEach(role -> {
                 switch (role) {
                     case "admin":
-                        Role adminRole = roleRepository.findByName(EnumRole.ROLE_ADMIN)
-                                .orElseThrow(() -> new RuntimeException("Le rôle ADMIN n'est pas trouvé."));
+                        // Rôle admin (ID 2)
+                        Role adminRole = roleRepository.findById(2)
+                                .orElseThrow(() -> new RuntimeException("Rôle non trouvé"));
                         roles.add(adminRole);
                         break;
                     default:
-                        Role userRole = roleRepository.findByName(EnumRole.ROLE_USER)
-                                .orElseThrow(() -> new RuntimeException("Le rôle USER n'est pas trouvé."));
+                        // Rôle utilisateur (ID 1)
+                        Role userRole = roleRepository.findById(1)
+                                .orElseThrow(() -> new RuntimeException("Rôle non trouvé"));
                         roles.add(userRole);
                 }
             });
