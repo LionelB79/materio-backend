@@ -8,9 +8,9 @@ import java.util.Set;
 
 public interface LocalityService {
     LocalityBO createLocality(LocalityBO localityBO);
-    LocalityBO getLocality(String name);
-    LocalityBO updateLocality(String name, LocalityBO localityBO);
-    void deleteLocality(String name);
+    LocalityBO getLocality(Long id);
+    LocalityBO getLocalityByName(String name);
+    LocalityBO updateLocality(Long id, LocalityBO localityBO);
+    void deleteLocality(Long id);
     Set<LocalityBO> getAllLocalities();
-
 }

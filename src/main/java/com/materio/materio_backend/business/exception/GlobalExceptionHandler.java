@@ -4,12 +4,15 @@ import com.materio.materio_backend.business.exception.equipment.DuplicateEquipme
 import com.materio.materio_backend.business.exception.equipment.EquipmentLocationMismatchException;
 import com.materio.materio_backend.business.exception.equipment.EquipmentNotFoundException;
 import com.materio.materio_backend.business.exception.locality.DuplicateLocalityException;
+import com.materio.materio_backend.business.exception.locality.LocalityNotEmptyException;
 import com.materio.materio_backend.business.exception.locality.LocalityNotFoundException;
 import com.materio.materio_backend.business.exception.reference.InvalidQuantityException;
+import com.materio.materio_backend.business.exception.reference.ReferenceNotFoundException;
 import com.materio.materio_backend.business.exception.space.DuplicateSpaceException;
 import com.materio.materio_backend.business.exception.space.SpaceHasEquipedZonesException;
 import com.materio.materio_backend.business.exception.space.SpaceNotEmptyException;
 import com.materio.materio_backend.business.exception.space.SpaceNotFoundException;
+import com.materio.materio_backend.business.exception.transfer.TransferValidationException;
 import com.materio.materio_backend.business.exception.zone.DuplicateZoneException;
 import com.materio.materio_backend.business.exception.zone.ZoneNotEmptyException;
 import com.materio.materio_backend.business.exception.zone.ZoneNotFoundException;
@@ -22,26 +25,15 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler(SpaceNotFoundException.class)
-    ProblemDetail handleSpaceNotFoundException(SpaceNotFoundException e) {
+    @ExceptionHandler(DuplicateEquipmentException.class)
+    ProblemDetail handleDuplicateEquipmentException(DuplicateEquipmentException e) {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
-                HttpStatus.NOT_FOUND,
+                HttpStatus.CONFLICT,
                 e.getMessage()
         );
-        problemDetail.setTitle("Salle non trouvée");
+        problemDetail.setTitle("Equipment déjà existant");
         return problemDetail;
     }
-
-    @ExceptionHandler(EquipmentNotFoundException.class)
-    ProblemDetail handleEquipmentNotFoundException(EquipmentNotFoundException e) {
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
-                HttpStatus.NOT_FOUND,
-                e.getMessage()
-        );
-        problemDetail.setTitle("Equipment non trouvée");
-        return problemDetail;
-    }
-
     @ExceptionHandler(EquipmentLocationMismatchException.class)
     ProblemDetail handleEquipmentLocationMismatchException(EquipmentLocationMismatchException e) {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
@@ -51,24 +43,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         problemDetail.setTitle("Localisation d'équipement incorrecte");
         return problemDetail;
     }
-
-    @ExceptionHandler(LocalityNotFoundException.class)
-    ProblemDetail handleLocalityNotFoundException(LocalityNotFoundException e) {
+    @ExceptionHandler(EquipmentNotFoundException.class)
+    ProblemDetail handleEquipmentNotFoundException(EquipmentNotFoundException e) {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
                 HttpStatus.NOT_FOUND,
                 e.getMessage()
         );
-        problemDetail.setTitle("Localité introuvable");
-        return problemDetail;
-    }
-
-    @ExceptionHandler(DuplicateEquipmentException.class)
-    ProblemDetail handleDuplicateEquipmentException(DuplicateEquipmentException e) {
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
-                HttpStatus.CONFLICT,
-                e.getMessage()
-        );
-        problemDetail.setTitle("Equipment déjà existant");
+        problemDetail.setTitle("Equipment non trouvée");
         return problemDetail;
     }
 
@@ -82,15 +63,26 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return problemDetail;
     }
 
-    @ExceptionHandler(SpaceNotEmptyException.class)
-    ProblemDetail handleRoomNotEmptyException(SpaceNotEmptyException e) {
+    @ExceptionHandler(LocalityNotEmptyException.class)
+    ProblemDetail handleLocalityNotEmptyException(LocalityNotEmptyException e) {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
                 HttpStatus.CONFLICT,
                 e.getMessage()
         );
-        problemDetail.setTitle("Espace non vide");
+        problemDetail.setTitle("Localité non vide");
         return problemDetail;
     }
+
+    @ExceptionHandler(LocalityNotFoundException.class)
+    ProblemDetail handleLocalityNotFoundException(LocalityNotFoundException e) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.NOT_FOUND,
+                e.getMessage()
+        );
+        problemDetail.setTitle("Localité introuvable");
+        return problemDetail;
+    }
+
 
     @ExceptionHandler(InvalidQuantityException.class)
     ProblemDetail handleInvalidQuantityException(InvalidQuantityException e) {
@@ -102,23 +94,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return problemDetail;
     }
 
-    @ExceptionHandler(SpaceHasEquipedZonesException.class)
-    ProblemDetail handleSpaceHasEquipedZonesException(SpaceHasEquipedZonesException e) {
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
-                HttpStatus.CONFLICT,
-                e.getMessage()
-        );
-        problemDetail.setTitle("Espace non vide");
-        return problemDetail;
-    }
-
-    @ExceptionHandler(ZoneNotFoundException.class)
-    ProblemDetail handleZoneNotFoundException(ZoneNotFoundException e) {
+    @ExceptionHandler(ReferenceNotFoundException.class)
+    ProblemDetail handleReferenceNotFoundException(ReferenceNotFoundException e) {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
                 HttpStatus.NOT_FOUND,
                 e.getMessage()
         );
-        problemDetail.setTitle("Zone introuvable");
+        problemDetail.setTitle("Reference Inconnue");
         return problemDetail;
     }
 
@@ -132,16 +114,45 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return problemDetail;
     }
 
-    @ExceptionHandler(ZoneNotEmptyException.class)
-    ProblemDetail handleZoneNotEmptyException(ZoneNotEmptyException e) {
+    @ExceptionHandler(SpaceNotEmptyException.class)
+    ProblemDetail handleRoomNotEmptyException(SpaceNotEmptyException e) {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
                 HttpStatus.CONFLICT,
                 e.getMessage()
         );
-        problemDetail.setTitle("Zone non vide");
+        problemDetail.setTitle("Espace non vide");
         return problemDetail;
     }
 
+    @ExceptionHandler(SpaceHasEquipedZonesException.class)
+    ProblemDetail handleSpaceHasEquipedZonesException(SpaceHasEquipedZonesException e) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.CONFLICT,
+                e.getMessage()
+        );
+        problemDetail.setTitle("Espace non vide");
+        return problemDetail;
+    }
+
+    @ExceptionHandler(SpaceNotFoundException.class)
+    ProblemDetail handleSpaceNotFoundException(SpaceNotFoundException e) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.NOT_FOUND,
+                e.getMessage()
+        );
+        problemDetail.setTitle("Salle non trouvée");
+        return problemDetail;
+    }
+
+    @ExceptionHandler(TransferValidationException.class)
+    ProblemDetail handleTransferValidationException(TransferValidationException e) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.CONFLICT,
+                e.getMessage()
+        );
+        problemDetail.setTitle("Les equipements doivent provenir de la même localité ");
+        return problemDetail;
+    }
 
     @ExceptionHandler(DuplicateZoneException.class)
     ProblemDetail handleDuplicateZoneException(DuplicateZoneException e) {
@@ -152,5 +163,26 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         problemDetail.setTitle("Zone déjà existante");
         return problemDetail;
     }
+
+    @ExceptionHandler(ZoneNotFoundException.class)
+    ProblemDetail handleZoneNotFoundException(ZoneNotFoundException e) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.NOT_FOUND,
+                e.getMessage()
+        );
+        problemDetail.setTitle("Zone introuvable");
+        return problemDetail;
+    }
+
+    @ExceptionHandler(ZoneNotEmptyException.class)
+    ProblemDetail handleZoneNotEmptyException(ZoneNotEmptyException e) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.CONFLICT,
+                e.getMessage()
+        );
+        problemDetail.setTitle("Zone non vide");
+        return problemDetail;
+    }
+
 
 }

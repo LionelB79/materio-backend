@@ -28,81 +28,91 @@ public class SpaceServiceImpl implements SpaceService {
 
     @Autowired
     private SpaceMapper spaceMapper;
-    @Autowired
-    private LocalityMapper localityMapper;
+
     @Autowired
     private LocalityRepository localityRepository;
 
-
     @Override
     public SpaceBO createSpace(final SpaceBO spaceBO) {
-
         // On récupère directement l'entité Locality depuis le repository
-        Locality locality = localityRepository.findByName(spaceBO.getLocalityName())
-                .orElseThrow(() -> new LocalityNotFoundException(spaceBO.getLocalityName()));
-
+        Locality locality = localityRepository.findById(spaceBO.getLocalityId())
+                .orElseThrow(() -> new LocalityNotFoundException("ID: " + spaceBO.getLocalityId()));
 
         // On vérifie que l'espace n'existe pas déjà pour cette localité
-        spaceRepo.findByNameAndLocality_Name(spaceBO.getName(), spaceBO.getLocalityName())
-                .ifPresent(r -> {
-                    throw new DuplicateSpaceException(spaceBO.getName());
-                });
+        if (spaceRepo.existsByNameAndLocalityId(spaceBO.getName(), spaceBO.getLocalityId())) {
+            throw new DuplicateSpaceException(spaceBO.getName());
+        }
 
         // Création et configuration du nouvel espace
         Space space = spaceMapper.boToEntity(spaceBO);
-        space.setLocality(locality);  // On utilise l'entité récupérée de la base
+        space.setLocality(locality);
 
         Space savedSpace = spaceRepo.save(space);
         return spaceMapper.entityToBO(savedSpace);
     }
 
     @Override
-    public SpaceBO updateSpace(String localityName, String spaceName, SpaceBO spaceBO) {
-        Space space = spaceRepo.findByNameAndLocality_Name(spaceName, localityName)
-                .orElseThrow(() -> new SpaceNotFoundException(spaceName));
-
-
-        if (!spaceName.equals(spaceBO.getName())) {
-            spaceRepo.findByName(spaceBO.getName())
-                    .ifPresent(s -> {
-                        throw new DuplicateSpaceException(spaceBO.getName());
-                    });
-        }
-
-        space.setName(spaceBO.getName());
-
-
-        return spaceMapper.entityToBO(spaceRepo.save(space));
-    }
-
-    @Override
-    public void deleteSpace(final String locality, final String spaceName) {
-        final SpaceBO spaceBO = getSpace(locality, spaceName);
-
-        boolean hasEquipment = spaceBO.getZones().stream()
-                .anyMatch(zone -> !zone.getEquipments().isEmpty());
-
-        if (hasEquipment) {
-            throw new SpaceHasEquipedZonesException(spaceName);
-        }
-        spaceRepo.delete(spaceMapper.boToEntity(spaceBO));
-    }
-
-    @Override
-    public Set<SpaceBO> getSpacesByLocality(String localityName) {
-        localityRepository.findByName(localityName)
-                .orElseThrow(() -> new LocalityNotFoundException(localityName));
-        Set<Space> spaces = spaceRepo.findByLocality_Name(localityName);
-
-        return spaces.stream()
-                .map(space -> spaceMapper.entityToBO(space)).collect(Collectors.toSet());
-    }
-
-    @Override
-    public SpaceBO getSpace(String localityName, String name) {
-        Space space = spaceRepo.findByNameAndLocality_Name(name, localityName)
-                .orElseThrow(() -> new SpaceNotFoundException(name));
+    public SpaceBO getSpace(Long id) {
+        Space space = spaceRepo.findById(id)
+                .orElseThrow(() -> new SpaceNotFoundException("ID: " + id));
         return spaceMapper.entityToBO(space);
     }
 
+    @Override
+    public SpaceBO updateSpace(Long id, SpaceBO spaceBO) {
+        Space space = spaceRepo.findById(id)
+                .orElseThrow(() -> new SpaceNotFoundException("ID: " + id));
+
+        // Si le nom change, vérifier l'unicité
+        if (!space.getName().equals(spaceBO.getName()) &&
+                spaceRepo.existsByNameAndLocalityId(spaceBO.getName(), space.getLocality().getId())) {
+            throw new DuplicateSpaceException(spaceBO.getName());
+        }
+
+        // Si la localité change
+        if (!space.getLocality().getId().equals(spaceBO.getLocalityId())) {
+            Locality newLocality = localityRepository.findById(spaceBO.getLocalityId())
+                    .orElseThrow(() -> new LocalityNotFoundException("ID: " + spaceBO.getLocalityId()));
+            space.setLocality(newLocality);
+        }
+
+        space.setName(spaceBO.getName());
+        Space savedSpace = spaceRepo.save(space);
+        return spaceMapper.entityToBO(savedSpace);
+    }
+
+    @Override
+    public void deleteSpace(final Long id) {
+        Space space = spaceRepo.findById(id)
+                .orElseThrow(() -> new SpaceNotFoundException("ID: " + id));
+
+        boolean hasEquipment = space.getZones().stream()
+                .anyMatch(zone -> !zone.getEquipments().isEmpty());
+
+        if (hasEquipment) {
+            throw new SpaceHasEquipedZonesException(space.getName());
+        }
+
+        spaceRepo.delete(space);
+    }
+
+    @Override
+    public Set<SpaceBO> getSpacesByLocalityId(Long localityId) {
+        // Vérifier que la localité existe
+        if (!localityRepository.existsById(localityId)) {
+            throw new LocalityNotFoundException("ID: " + localityId);
+        }
+
+        Set<Space> spaces = spaceRepo.findByLocalityId(localityId);
+        return spaces.stream()
+                .map(space -> spaceMapper.entityToBO(space))
+                .collect(Collectors.toSet());
+    }
+
+    @Override
+    public SpaceBO getSpaceByNameAndLocalityId(Long localityId, String spaceName) {
+        Space space = spaceRepo.findByNameAndLocalityId(spaceName, localityId)
+                .orElseThrow(() -> new SpaceNotFoundException(spaceName));
+        return spaceMapper.entityToBO(space);
+    }
 }

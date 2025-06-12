@@ -15,6 +15,8 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 public class LocalityBO {
+    private Long id;
+
     @NotBlank(message = "Le nom est obligatoire")
     @Size(min = 2, max = 50, message = "Le nom doit contenir entre 2 et 50 caractères")
     private String name;

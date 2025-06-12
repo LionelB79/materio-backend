@@ -4,36 +4,42 @@ import com.materio.materio_backend.business.service.EquipmentTransferService;
 import com.materio.materio_backend.dto.Transfer.EquipmentTransferBO;
 import com.materio.materio_backend.dto.Transfer.EquipmentTransferMapper;
 import com.materio.materio_backend.dto.Transfer.EquipmentTransferVO;
+import com.materio.materio_backend.dto.Transfer.TransferHistoryVO;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Set;
 
 @RestController
-@RequestMapping("/api/transfers")
+@RequestMapping("/transfers")
 public class EquipmentTransferController {
-@Autowired
+
+    @Autowired
     private EquipmentTransferService transferService;
-@Autowired
+
+    @Autowired
     private EquipmentTransferMapper transferMapper;
 
     @PostMapping
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<Set<EquipmentTransferVO>> transferEquipments(
             @Valid @RequestBody EquipmentTransferVO transferVO) {
         EquipmentTransferBO transferBO = transferMapper.voToBO(transferVO);
         Set<EquipmentTransferBO> resultBOs = transferService.processTransfer(transferBO);
-        return ResponseEntity.ok(transferMapper.boSetToVOSet(resultBOs));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(transferMapper.boSetToVOSet(resultBOs));
     }
 
-    @GetMapping("/{referenceName}/{serialNumber}")
-    public ResponseEntity<Set<EquipmentTransferVO>> getTransferHistory(
-            @PathVariable String referenceName,
-            @PathVariable String serialNumber) {
-
-        Set<EquipmentTransferBO> historyBO = transferService.getTransferHistory(referenceName, serialNumber);
-        return ResponseEntity.ok(transferMapper.boSetToVOSet(historyBO));
+    @GetMapping("/equipment/{equipmentId}")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public ResponseEntity<Set<TransferHistoryVO>> getTransferHistory(
+            @PathVariable Long equipmentId) {
+        Set<TransferHistoryVO> history = transferService.getTransferHistory(equipmentId);
+        return ResponseEntity.ok(history);
     }
 }

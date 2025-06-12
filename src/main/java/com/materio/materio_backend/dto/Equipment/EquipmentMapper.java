@@ -9,6 +9,7 @@ public class EquipmentMapper {
         if (bo == null) return null;
 
         Equipment entity = new Equipment();
+        entity.setId(bo.getId());
         entity.setSerialNumber(bo.getSerialNumber());
         entity.setReferenceName(bo.getReferenceName());
         entity.setPurchaseDate(bo.getPurchaseDate());
@@ -23,6 +24,7 @@ public class EquipmentMapper {
         if (entity == null) return null;
 
         EquipmentBO bo = new EquipmentBO();
+        bo.setId(entity.getId());
         bo.setSerialNumber(entity.getSerialNumber());
         bo.setReferenceName(entity.getReferenceName());
         bo.setPurchaseDate(entity.getPurchaseDate());
@@ -31,14 +33,9 @@ public class EquipmentMapper {
         bo.setTag(entity.getTag());
         bo.setBarCode(entity.getBarcode());
 
+        // On récupère et on définit uniquement l'ID de zone
         if (entity.getZone() != null) {
-            bo.setZoneName(entity.getZone().getName());
-            if (entity.getZone().getSpace() != null) {
-                bo.setSpaceName(entity.getZone().getSpace().getName());
-                if (entity.getZone().getSpace().getLocality() != null) {
-                    bo.setLocalityName(entity.getZone().getSpace().getLocality().getName());
-                }
-            }
+            bo.setZoneId(entity.getZone().getId());
         }
 
         return bo;
@@ -48,14 +45,13 @@ public class EquipmentMapper {
         if (bo == null) return null;
 
         EquipmentVO vo = new EquipmentVO();
+        vo.setId(bo.getId());
         vo.setSerialNumber(bo.getSerialNumber());
         vo.setReferenceName(bo.getReferenceName());
         vo.setPurchaseDate(bo.getPurchaseDate());
         vo.setMark(bo.getMark());
         vo.setDescription(bo.getDescription());
-        vo.setZoneName(bo.getZoneName());
-        vo.setSpaceName(bo.getSpaceName());
-        vo.setLocalityName(bo.getLocalityName());
+        vo.setZoneId(bo.getZoneId());
         vo.setTag(bo.getTag());
         vo.setBarCode(bo.getBarCode());
 
@@ -66,14 +62,13 @@ public class EquipmentMapper {
         if (vo == null) return null;
 
         EquipmentBO bo = new EquipmentBO();
+        bo.setId(vo.getId());
         bo.setSerialNumber(vo.getSerialNumber());
         bo.setReferenceName(vo.getReferenceName());
         bo.setPurchaseDate(vo.getPurchaseDate());
         bo.setMark(vo.getMark());
         bo.setDescription(vo.getDescription());
-        bo.setZoneName(vo.getZoneName());
-        bo.setSpaceName(vo.getSpaceName());
-        bo.setLocalityName(vo.getLocalityName());
+        bo.setZoneId(vo.getZoneId());
         bo.setTag(vo.getTag());
         bo.setBarCode(vo.getBarCode());
 

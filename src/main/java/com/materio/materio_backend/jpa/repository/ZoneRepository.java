@@ -10,11 +10,11 @@ import java.util.Set;
 
 @Repository
 public interface ZoneRepository extends JpaRepository<Zone, Long> {
+    Optional<Zone> findByNameAndSpaceId(String zoneName, Long spaceId);
+    List<Zone> findBySpaceId(Long spaceId);
+    boolean existsByNameAndSpaceId(String name, Long spaceId);
+
+    // Méthodes de compatibilité si nécessaire
     Optional<Zone> findByNameAndSpaceNameAndSpaceLocalityName(
             String zoneName, String spaceName, String localityName);
-
-    List<Zone> findBySpaceNameAndSpaceLocalityName(
-            String spaceName, String localityName);
-
-    boolean existsByNameAndSpaceId(String name, Long spaceId);
 }

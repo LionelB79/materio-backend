@@ -14,9 +14,8 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class EquipmentTransferVO {
-    private Set<EquipmentToTransfer> equipments = new HashSet<>();
-    private String targetZoneName;
-    private String targetSpaceName;
-    private String targetLocalityName;
+    private Long id;
+    private Set<Long> equipmentIds = new HashSet<>();
+    private Long targetZoneId;
     private String details;
 }

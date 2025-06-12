@@ -7,9 +7,11 @@ import java.util.List;
 import java.util.Set;
 
 public interface SpaceService {
-    SpaceBO getSpace(String locality, String spaceName);
+    SpaceBO getSpace(Long id);
     SpaceBO createSpace(SpaceBO spaceBO);
-    void deleteSpace(String locality, String spaceName);
-    Set<SpaceBO> getSpacesByLocality(String locality);
-    SpaceBO updateSpace(String localityName, String spaceName, SpaceBO spaceBO);
+    SpaceBO updateSpace(Long id, SpaceBO spaceBO);
+    void deleteSpace(Long id);
+    Set<SpaceBO> getSpacesByLocalityId(Long localityId);
+    // Méthode de compatibilité si nécessaire
+    SpaceBO getSpaceByNameAndLocalityId(Long localityId, String spaceName);
 }

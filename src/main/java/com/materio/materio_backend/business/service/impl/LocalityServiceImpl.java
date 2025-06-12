@@ -21,7 +21,6 @@ import java.util.stream.Collectors;
 @Transactional(rollbackOn = Exception.class)
 public class LocalityServiceImpl implements LocalityService {
 
-
     @Autowired
     private LocalityRepository localityRepo;
     @Autowired
@@ -31,12 +30,10 @@ public class LocalityServiceImpl implements LocalityService {
 
     @Override
     public LocalityBO createLocality(final LocalityBO localityBO) {
-
         // Vérification de l'unicité du nom
-        localityRepo.findByName(localityBO.getName())
-                .ifPresent(l -> {
-                    throw new DuplicateLocalityException(localityBO.getName());
-                });
+        if (localityRepo.existsByName(localityBO.getName())) {
+            throw new DuplicateLocalityException(localityBO.getName());
+        }
 
         // Conversion et sauvegarde
         Locality entity = localityMapper.boToEntity(localityBO);
@@ -46,8 +43,15 @@ public class LocalityServiceImpl implements LocalityService {
     }
 
     @Override
-    public LocalityBO getLocality(final String name) {
+    public LocalityBO getLocality(final Long id) {
+        Locality entity = localityRepo.findById(id)
+                .orElseThrow(() -> new LocalityNotFoundException("ID: " + id));
 
+        return localityMapper.entityToBO(entity);
+    }
+
+    @Override
+    public LocalityBO getLocalityByName(final String name) {
         Locality entity = localityRepo.findByName(name)
                 .orElseThrow(() -> new LocalityNotFoundException(name));
 
@@ -56,26 +60,21 @@ public class LocalityServiceImpl implements LocalityService {
 
     @Override
     public Set<LocalityBO> getAllLocalities() {
-
-        List<Locality> entities = localityRepo.findAll();
-        return entities.stream()
+        return localityRepo.findAll().stream()
                 .map(localityMapper::entityToBO)
                 .collect(Collectors.toSet());
     }
 
     @Override
-    public LocalityBO updateLocality(final String name, final LocalityBO localityBO) {
-
+    public LocalityBO updateLocality(final Long id, final LocalityBO localityBO) {
         // Récupération de l'entité existante
-        Locality entity = localityRepo.findByName(name)
-                .orElseThrow(() -> new LocalityNotFoundException(name));
+        Locality entity = localityRepo.findById(id)
+                .orElseThrow(() -> new LocalityNotFoundException("ID: " + id));
 
-        // Vérification si le nouveau nom n'existe pas déjà
-        if (!name.equals(localityBO.getName())) {
-            localityRepo.findByName(localityBO.getName())
-                    .ifPresent(l -> {
-                        throw new DuplicateLocalityException(localityBO.getName());
-                    });
+        // Vérification si le nouveau nom n'existe pas déjà (si différent)
+        if (!entity.getName().equals(localityBO.getName()) &&
+                localityRepo.existsByName(localityBO.getName())) {
+            throw new DuplicateLocalityException(localityBO.getName());
         }
 
         // Mise à jour et sauvegarde
@@ -86,13 +85,12 @@ public class LocalityServiceImpl implements LocalityService {
     }
 
     @Override
-    public void deleteLocality(String localityName) {
+    public void deleteLocality(Long id) {
+        Locality locality = localityRepo.findById(id)
+                .orElseThrow(() -> new LocalityNotFoundException("ID: " + id));
 
-        Locality locality = localityRepo.findByName(localityName)
-                .orElseThrow(() -> new LocalityNotFoundException(localityName));
-
-        if (!validationService.isLocalityEmpty(localityName)) {
-            throw new LocalityNotEmptyException(localityName);
+        if (!validationService.isLocalityEmpty(locality.getName())) {
+            throw new LocalityNotEmptyException(locality.getName());
         }
 
         localityRepo.delete(locality);

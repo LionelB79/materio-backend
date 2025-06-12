@@ -12,6 +12,8 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class EquipmentBO {
+    private Long id;
+
     @NotBlank(message = "Le nom de référence est obligatoire")
     private String referenceName;
 
@@ -30,17 +32,9 @@ public class EquipmentBO {
     @Size(max = 500, message = "La description ne peut pas dépasser 500 caractères")
     private String description;
 
-    @NotBlank(message = "Le nom de la zone est obligatoire")
-    private String zoneName;
-
-    @NotBlank(message = "Le nom de l'espace est obligatoire")
-    private String spaceName;
-
-    @NotBlank(message = "Le nom de la localité est obligatoire")
-    private String localityName;
+    @NotNull(message = "L'ID de zone est obligatoire")
+    private Long zoneId;
 
     private String tag;
-
     private Integer barCode;
-
 }

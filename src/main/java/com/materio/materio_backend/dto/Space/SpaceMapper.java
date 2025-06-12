@@ -16,14 +16,16 @@ import java.util.stream.Collectors;
 @Component
 @RequiredArgsConstructor
 public class SpaceMapper {
-@Autowired
+    @Autowired
     private final ZoneMapper zoneMapper;
 
     public Space boToEntity(SpaceBO bo) {
         if (bo == null) return null;
 
         Space entity = new Space();
-        updateEntityFromBO(entity, bo);
+        entity.setId(bo.getId());
+        entity.setName(bo.getName());
+        // La locality sera définie dans le service
         return entity;
     }
 
@@ -35,6 +37,7 @@ public class SpaceMapper {
         bo.setName(entity.getName());
 
         if (entity.getLocality() != null) {
+            bo.setLocalityId(entity.getLocality().getId());
             bo.setLocalityName(entity.getLocality().getName());
         }
 
@@ -54,8 +57,8 @@ public class SpaceMapper {
         SpaceVO vo = new SpaceVO();
         vo.setId(bo.getId());
         vo.setName(bo.getName());
+        vo.setLocalityId(bo.getLocalityId());
         vo.setLocalityName(bo.getLocalityName());
-
 
         if (bo.getZones() != null) {
             vo.setZones(bo.getZones().stream()
@@ -74,8 +77,7 @@ public class SpaceMapper {
         SpaceBO bo = new SpaceBO();
         bo.setId(vo.getId());
         bo.setName(vo.getName());
-        bo.setLocalityName(vo.getLocalityName());
-
+        bo.setLocalityId(vo.getLocalityId());
 
         if (vo.getZones() != null) {
             bo.setZones(vo.getZones().stream()
@@ -97,9 +99,6 @@ public class SpaceMapper {
 
     public void updateEntityFromBO(Space entity, SpaceBO bo) {
         if (entity == null || bo == null) return;
-
-        entity.setId(bo.getId());
         entity.setName(bo.getName());
-
     }
 }

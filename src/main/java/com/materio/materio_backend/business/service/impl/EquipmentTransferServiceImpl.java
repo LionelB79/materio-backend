@@ -14,148 +14,155 @@ import com.materio.materio_backend.jpa.entity.Zone;
 import com.materio.materio_backend.jpa.repository.EquipmentRepository;
 import com.materio.materio_backend.jpa.repository.EquipmentTransferRepository;
 import com.materio.materio_backend.jpa.repository.ZoneRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Query;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-   @Service
-    @Transactional(rollbackOn = Exception.class)
-    public class EquipmentTransferServiceImpl implements EquipmentTransferService {
+@Service
+@Transactional(rollbackOn = Exception.class)
+public class EquipmentTransferServiceImpl implements EquipmentTransferService {
 
+    @Autowired
+    private EquipmentRepository equipmentRepo;
 
-       @Autowired
-       private EquipmentRepository equipmentRepo;
-       @Autowired
-       private EquipmentTransferRepository equipmentTransferRepo;
-       @Autowired
-       private ZoneRepository zoneRepository;
-       @Autowired
-       private EquipmentMapper equipmentMapper;
-       @Autowired
-       private EquipmentTransferMapper transferMapper;
+    @Autowired
+    private EquipmentTransferRepository equipmentTransferRepo;
 
-       @Override
-       public Set<EquipmentTransferBO> processTransfer(EquipmentTransferBO transferBO) {
-           // On vérifie si la zone cible existe
-           validateTargetZone(transferBO);
+    @Autowired
+    private ZoneRepository zoneRepository;
 
-           // Vérification que tous les équipements sont de la même localité source
-           validateSameSourceLocality(transferBO);
+    @Autowired
+    private EquipmentTransferMapper transferMapper;
 
-           Set<EquipmentTransferBO> results = new HashSet<>();
+    @PersistenceContext
+    private EntityManager entityManager;
 
+    @Override
+    public Set<EquipmentTransferBO> processTransfer(EquipmentTransferBO transferBO) {
+        // Vérifier que la zone cible existe
+        Zone targetZone = zoneRepository.findById(transferBO.getTargetZoneId())
+                .orElseThrow(() -> new ZoneNotFoundException("ID: " + transferBO.getTargetZoneId()));
 
-           for (EquipmentToTransfer equipmentToTransfer : transferBO.getEquipments()) {
+        Set<EquipmentTransferBO> results = new HashSet<>();
+        Set<Equipment> equipmentsToTransfer = new HashSet<>();
 
-               Equipment equipment = equipmentRepo.findByIdSerialNumberAndIdReferenceName(
-                               equipmentToTransfer.getSerialNumber(),
-                               equipmentToTransfer.getReferenceName())
-                       .orElseThrow(() -> new EquipmentNotFoundException(equipmentToTransfer.getReferenceName()));
+        // Récupérer tous les équipements par ID
+        for (Long equipmentId : transferBO.getEquipmentIds()) {
+            Equipment equipment = equipmentRepo.findById(equipmentId)
+                    .orElseThrow(() -> new EquipmentNotFoundException("ID: " + equipmentId));
+            equipmentsToTransfer.add(equipment);
+        }
 
-               EquipmentBO equipmentBO = equipmentMapper.entityToBO(equipment);
+        // Vérification que tous les équipements sont de la même localité source
+        validateSameSourceLocality(equipmentsToTransfer);
 
-               validateCurrentLocation(equipmentBO, equipmentToTransfer);
+        for (Equipment equipment : equipmentsToTransfer) {
+            // Créer et sauvegarder le transfert
+            EquipmentTransfer transfer = createTransferEntity(equipment, targetZone, transferBO);
+            EquipmentTransfer savedTransfer = equipmentTransferRepo.save(transfer);
 
-               // Création et sauvegarde du transfert
-               EquipmentTransfer transfer = createTransferEntity(equipmentBO, equipmentToTransfer, transferBO);
-               EquipmentTransfer savedTransfer = equipmentTransferRepo.save(transfer);
+            // Mettre à jour la localisation de l'équipement
+            equipment.setZone(targetZone);
+            equipmentRepo.save(equipment);
 
-               // Mise à jour de la localisation de l'équipement
-               updateEquipmentLocation(equipment, transferBO);
+            // Pour la réponse, définir les IDs correctement
+            EquipmentTransferBO responseBO = transferMapper.entityToBO(savedTransfer);
+            responseBO.setTargetZoneId(transferBO.getTargetZoneId());
+            results.add(responseBO);
+        }
 
-               results.add(transferMapper.entityToBO(savedTransfer));
-           }
+        return results;
+    }
 
-           return results;
-       }
+    @Override
+    public Set<TransferHistoryVO> getTransferHistory(Long equipmentId) {
+        // Utilisation de la vue pour récupérer l'historique complet
+        String queryStr = "SELECT t.id, t.equipment_id, e.reference_name, e.serial_number, " +
+                "t.from_zone_id, fz.name, fs.name, fl.name, " +
+                "t.to_zone_id, tz.name, ts.name, tl.name, " +
+                "t.transfer_date, t.transfer_details " +
+                "FROM t_transfer t " +
+                "JOIN t_equipment e ON t.equipment_id = e.id " +
+                "LEFT JOIN t_zone fz ON t.from_zone_id = fz.id " +
+                "LEFT JOIN t_space fs ON fz.space_id = fs.id " +
+                "LEFT JOIN t_locality fl ON fs.locality_id = fl.id " +
+                "LEFT JOIN t_zone tz ON t.to_zone_id = tz.id " +
+                "LEFT JOIN t_space ts ON tz.space_id = ts.id " +
+                "LEFT JOIN t_locality tl ON ts.locality_id = tl.id " +
+                "WHERE t.equipment_id = :equipmentId";
 
-       private void validateTargetZone(EquipmentTransferBO transferBO) {
-           // Vérification de la zone cible
-           zoneRepository.findByNameAndSpaceNameAndSpaceLocalityName(
-                           transferBO.getTargetZoneName(),
-                           transferBO.getTargetSpaceName(),
-                           transferBO.getTargetLocalityName())
-                   .orElseThrow(() -> new ZoneNotFoundException(transferBO.getTargetZoneName()));
-       }
+        Query query = entityManager.createNativeQuery(queryStr);
+        query.setParameter("equipmentId", equipmentId);
 
-       private void validateCurrentLocation(EquipmentBO equipment, EquipmentToTransfer equipmentToTransfer) {
-           boolean locationMismatch = !equipment.getZoneName().equals(equipmentToTransfer.getSourceZoneName()) ||
-                   !equipment.getSpaceName().equals(equipmentToTransfer.getSourceSpaceName());
+        @SuppressWarnings("unchecked")
+        List<Object[]> results = query.getResultList();
 
-           if (locationMismatch) {
-               throw new EquipmentLocationMismatchException(
-                       equipmentToTransfer.getReferenceName(),
-                       equipment.getZoneName(),
-                       equipment.getSpaceName(),
-                       equipment.getLocalityName(),
-                       equipmentToTransfer.getSourceZoneName(),
-                       equipmentToTransfer.getSourceSpaceName(),
-                       equipment.getLocalityName()); // Même localité source
-           }
-       }
+        Set<TransferHistoryVO> historySet = new HashSet<>();
 
-       private EquipmentTransfer createTransferEntity(EquipmentBO equipment, EquipmentToTransfer equipmentToTransfer, EquipmentTransferBO transferBO) {
-           EquipmentTransfer transfer = new EquipmentTransfer();
-           transfer.setEquipment(equipmentMapper.boToEntity(equipment));
-           transfer.setTransferDate(LocalDateTime.now());
+        for (Object[] result : results) {
+            TransferHistoryVO vo = new TransferHistoryVO();
+            int i = 0;
 
-           // Source
-           transfer.setFromZone(equipmentToTransfer.getSourceZoneName());
-           transfer.setFromSpace(equipmentToTransfer.getSourceSpaceName());
-           transfer.setFromLocality(equipment.getLocalityName());
+            vo.setId(((Number) result[i++]).longValue());
+            vo.setEquipmentId(((Number) result[i++]).longValue());
+            vo.setEquipmentReference((String) result[i++]);
+            vo.setEquipmentSerialNumber((String) result[i++]);
 
-           // Destination
-           transfer.setToZone(transferBO.getTargetZoneName());
-           transfer.setToSpace(transferBO.getTargetSpaceName());
-           transfer.setToLocality(transferBO.getTargetLocalityName());
+            vo.setFromZoneId(result[i] != null ? ((Number) result[i]).longValue() : null);
+            i++;
+            vo.setFromZone((String) result[i++]);
+            vo.setFromSpace((String) result[i++]);
+            vo.setFromLocality((String) result[i++]);
 
-           transfer.setDetails(transferBO.getDetails());
+            vo.setToZoneId(result[i] != null ? ((Number) result[i]).longValue() : null);
+            i++;
+            vo.setToZone((String) result[i++]);
+            vo.setToSpace((String) result[i++]);
+            vo.setToLocality((String) result[i++]);
 
-           return transfer;
-       }
+            if (null != result[i]) {
+                java.sql.Timestamp timestamp = (java.sql.Timestamp) result[i];
+                vo.setTransferDate(timestamp.toLocalDateTime());
+            }
+            i++;
+            vo.setDetails((String) result[i]);
 
-       private void updateEquipmentLocation(Equipment equipment, EquipmentTransferBO transferBO) {
-           // Récupérer la zone cible
-           Zone targetZone = zoneRepository.findByNameAndSpaceNameAndSpaceLocalityName(
-                           transferBO.getTargetZoneName(),
-                           transferBO.getTargetSpaceName(),
-                           transferBO.getTargetLocalityName())
-                   .orElseThrow(() -> new ZoneNotFoundException(transferBO.getTargetZoneName()));
+            historySet.add(vo);
+        }
 
-           // Mettre à jour directement
-           equipment.setZone(targetZone);
-           equipmentRepo.save(equipment);
-       }
+        return historySet;
+    }
 
-       @Override
-       public Set<EquipmentTransferBO> getTransferHistory(String referenceName, String serialNumber) {
-           return equipmentTransferRepo
-                   .findByEquipmentIdReferenceNameAndEquipmentIdSerialNumber(referenceName, serialNumber)
-                   .stream()
-                   .map(transferMapper::entityToBO)
-                   .collect(Collectors.toSet());
-       }
+    private EquipmentTransfer createTransferEntity(Equipment equipment, Zone targetZone, EquipmentTransferBO transferBO) {
+        EquipmentTransfer transfer = new EquipmentTransfer();
+        transfer.setEquipment(equipment);
+        transfer.setTransferDate(LocalDateTime.now());
 
-       private void validateSameSourceLocality(EquipmentTransferBO transferBO) {
-           // Récupérer tous les équipements et vérifier qu'ils sont de la même localité
-           Set<String> sourceLocalities = transferBO.getEquipments().stream()
-                   .map(equipment -> {
-                       Equipment eq = equipmentRepo.findByIdSerialNumberAndIdReferenceName(
-                                       equipment.getSerialNumber(),
-                                       equipment.getReferenceName())
-                               .orElseThrow(() -> new EquipmentNotFoundException(equipment.getReferenceName()));
+        // Stocker uniquement les IDs des zones
+        transfer.setFromZoneId(equipment.getZone().getId());
+        transfer.setToZoneId(targetZone.getId());
 
-                       return eq.getZone().getSpace().getLocality().getName();
-                   })
-                   .collect(Collectors.toSet());
+        transfer.setDetails(transferBO.getDetails());
 
-           if (sourceLocalities.size() > 1) {
-               throw new TransferValidationException("Les équipements doivent provenir de la même localité");
-           }
-       }
-   }
+        return transfer;
+    }
+
+    private void validateSameSourceLocality(Set<Equipment> equipments) {
+        Set<Long> sourceLocalityIds = equipments.stream()
+                .map(eq -> eq.getZone().getSpace().getLocality().getId())
+                .collect(Collectors.toSet());
+
+        if (sourceLocalityIds.size() > 1) {
+            throw new TransferValidationException("Les équipements doivent provenir de la même localité");
+        }
+    }
+}
