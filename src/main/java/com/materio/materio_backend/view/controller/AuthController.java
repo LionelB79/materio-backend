@@ -1,7 +1,7 @@
 package com.materio.materio_backend.view.controller;
 
 
-import com.materio.materio_backend.business.service.AuthService;
+import com.materio.materio_backend.business.service.impl.AuthServiceImpl;
 import com.materio.materio_backend.dto.User.JwtResponse;
 import com.materio.materio_backend.dto.User.LoginRequest;
 import com.materio.materio_backend.dto.User.MessageResponse;
@@ -20,14 +20,14 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     @Autowired
-    private AuthService authService;
+    private AuthServiceImpl authServiceImpl;
 
     /**
      * Authentifie un utilisateur et génère un token JWT
      */
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
-        JwtResponse jwtResponse = authService.authenticateUser(loginRequest);
+        JwtResponse jwtResponse = authServiceImpl.authenticateUser(loginRequest);
         return ResponseEntity.ok(jwtResponse);
     }
 
@@ -37,7 +37,7 @@ public class AuthController {
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
         try {
-            authService.registerUser(signUpRequest);
+            authServiceImpl.registerUser(signUpRequest);
             return ResponseEntity.ok(new MessageResponse("Utilisateur enregistré avec succès!"));
         } catch (Exception e) {
             return ResponseEntity
