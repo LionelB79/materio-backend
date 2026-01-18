@@ -1,11 +1,11 @@
 package com.materio.materio_backend.business.service.impl;
 
 import com.materio.materio_backend.business.service.UserService;
-import com.materio.materio_backend.configs.UserDetailsImpl;
 import com.materio.materio_backend.dto.User.UserProfileResponse;
 import com.materio.materio_backend.dto.User.UserUpdateRequest;
-import com.materio.materio_backend.jpa.entity.user.User;
-import com.materio.materio_backend.jpa.repository.UserRepository;
+import com.squelette.squelette_backend.auth.entity.User;
+import com.squelette.squelette_backend.auth.repository.UserRepository;
+import com.squelette.squelette_backend.auth.service.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
@@ -48,7 +48,7 @@ public class UserServiceImpl implements UserService {
     /**
      * Met à jour le profil de l'utilisateur actuellement connecté
      */
-    @Transactional
+    @Transactional("authTransactionManager")
     @Override
     public UserProfileResponse updateCurrentUserProfile(UserUpdateRequest updateRequest) {
         // Récupérer l'utilisateur connecté
@@ -106,7 +106,7 @@ public class UserServiceImpl implements UserService {
     /**
      * Supprime un utilisateur par ID (admin seulement)
      */
-    @Transactional
+    @Transactional("authTransactionManager")
     @Override
     public void deleteUser(Long id) {
         // Vérifier que l'utilisateur existe
