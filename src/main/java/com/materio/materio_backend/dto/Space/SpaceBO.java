@@ -17,4 +17,5 @@ public class SpaceBO {
     private Long localityId;
     private String localityName;
     private Set<ZoneBO> zones = new HashSet<>();
+
 }
